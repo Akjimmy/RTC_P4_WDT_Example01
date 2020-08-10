@@ -1,0 +1,3785 @@
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m0
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 0
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.EnableRtcOperation,"ax",%progbits
+  20              		.align	2
+  21              		.global	EnableRtcOperation
+  22              		.code	16
+  23              		.thumb_func
+  24              		.type	EnableRtcOperation, %function
+  25              	EnableRtcOperation:
+  26              	.LFB64:
+  27              		.file 1 "main.c"
+   1:main.c        **** /*******************************************************************************
+   2:main.c        **** * File Name: main.c
+   3:main.c        **** *
+   4:main.c        **** * Version: 1.00
+   5:main.c        **** *
+   6:main.c        **** * Description:
+   7:main.c        **** *  This is the source code for the example project of the RTC_P4 component.
+   8:main.c        **** *
+   9:main.c        **** ********************************************************************************
+  10:main.c        **** * Copyright 2015, Cypress Semiconductor Corporation. All rights reserved.
+  11:main.c        **** * This software is owned by Cypress Semiconductor Corporation and is protected
+  12:main.c        **** * by and subject to worldwide patent and copyright laws and treaties.
+  13:main.c        **** * Therefore, you may use this software only as provided in the license agreement
+  14:main.c        **** * accompanying the software package from which you obtained this software.
+  15:main.c        **** * CYPRESS AND ITS SUPPLIERS MAKE NO WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+  16:main.c        **** * WITH REGARD TO THIS SOFTWARE, INCLUDING, BUT NOT LIMITED TO, NONINFRINGEMENT,
+  17:main.c        **** * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+  18:main.c        **** *******************************************************************************/
+  19:main.c        **** 
+  20:main.c        **** #include <project.h>
+  21:main.c        **** #include <stdio.h>
+  22:main.c        **** 
+  23:main.c        **** #define LFCLK_CYCLES_PER_SECOND     (3276)//(16384)//(32768u)
+  24:main.c        **** 
+  25:main.c        **** #define WCO_STARTUP_DELAY_CYCLES    (LFCLK_CYCLES_PER_SECOND)
+  26:main.c        **** 
+  27:main.c        **** /* Time: 13:48:00 */
+  28:main.c        **** #define TIME_HOUR           (0x13u)
+  29:main.c        **** #define TIME_MIN            (0x48u)
+  30:main.c        **** #define TIME_SEC            (0x00u)
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 2
+
+
+  31:main.c        **** #define HOUR_OFFSET         (16u)
+  32:main.c        **** #define MIN_OFFSET          (8u)
+  33:main.c        **** #define TIME_HR_MIN_SEC     ((uint32)(TIME_HOUR << HOUR_OFFSET) | \
+  34:main.c        ****                             (uint32)(TIME_MIN << MIN_OFFSET)    | \
+  35:main.c        ****                              TIME_SEC)
+  36:main.c        **** /* Date: mm/dd/yy :08/10/2020 */
+  37:main.c        **** #define DATE_MONTH          (RTC_AUGUST)
+  38:main.c        **** #define DATE_DAY            (0x10)
+  39:main.c        **** #define DATE_YEAR           (0x2020u)
+  40:main.c        **** #define MONTH_OFFSET        (24u)
+  41:main.c        **** #define DAY_OFFSET          (16u)
+  42:main.c        **** #define DATE_MONTH_DAY_YEAR ((uint32)(DATE_MONTH << MONTH_OFFSET)   | \
+  43:main.c        ****                             (uint32)(DATE_DAY << DAY_OFFSET)        | \
+  44:main.c        ****                              DATE_YEAR)
+  45:main.c        **** 
+  46:main.c        **** /* Alarm Time: 15:44:00 */
+  47:main.c        **** #define ALARM_HOUR                  (0x04u)
+  48:main.c        **** #define ALARM_MIN                   (0x01u)
+  49:main.c        **** #define ALARM_SEC                   (0x30u)
+  50:main.c        **** #define ALARM_TIME_HR_MIN_SEC       ((uint32)(ALARM_HOUR << HOUR_OFFSET) | \
+  51:main.c        ****                                     (uint32)(ALARM_MIN << MIN_OFFSET)    | \
+  52:main.c        ****                                      ALARM_SEC)
+  53:main.c        **** 
+  54:main.c        **** /* Alarm Date: 12/18/2014 */
+  55:main.c        **** #define ALARM_DATE_MONTH_DAY_YEAR   (DATE_MONTH_DAY_YEAR)
+  56:main.c        **** 
+  57:main.c        **** #define TICK_EACH_1_HZ      (1u)
+  58:main.c        **** #define TICK_EACH_2_HZ      (2u)
+  59:main.c        **** #define TICK_EACH_10_HZ     (10u)
+  60:main.c        **** 
+  61:main.c        **** /* Alarm structure declaration */
+  62:main.c        **** RTC_DATE_TIME alarmTimeDate;
+  63:main.c        **** 
+  64:main.c        **** /* Alarm flag initialization */
+  65:main.c        **** uint32 alarmFlag = 0;
+  66:main.c        **** 
+  67:main.c        **** /* Interrupt prototypes */
+  68:main.c        **** CY_ISR_PROTO(EnableRtcOperation);
+  69:main.c        **** CY_ISR_PROTO(UpdateTimeIsrHandler);
+  70:main.c        **** CY_ISR_PROTO(AlarmIsrHandler);
+  71:main.c        **** 
+  72:main.c        **** uint32 ui100mS=0;
+  73:main.c        **** 
+  74:main.c        **** /*******************************************************************************
+  75:main.c        **** * Function Name: main
+  76:main.c        **** ********************************************************************************
+  77:main.c        **** *
+  78:main.c        **** * Summary:
+  79:main.c        **** *  The main() function.
+  80:main.c        **** *
+  81:main.c        **** * Parameters:
+  82:main.c        **** *  None.
+  83:main.c        **** *
+  84:main.c        **** * Return:
+  85:main.c        **** *  None.
+  86:main.c        **** *
+  87:main.c        **** *******************************************************************************/
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 3
+
+
+  88:main.c        **** int main()
+  89:main.c        **** {
+  90:main.c        ****     char timeBuffer[16u];
+  91:main.c        ****     char dateBuffer[16u];
+  92:main.c        **** 
+  93:main.c        ****     uint32 time;
+  94:main.c        ****     uint32 date;
+  95:main.c        ****     
+  96:main.c        ****     
+  97:main.c        ****     /* Enable WCO */
+  98:main.c        ****     CySysClkWcoStart();
+  99:main.c        ****     
+ 100:main.c        ****     /* Enable global interrupts */
+ 101:main.c        ****     CyGlobalIntEnable;
+ 102:main.c        **** 
+ 103:main.c        ****     /* Alarm structure initialization */
+ 104:main.c        ****     alarmTimeDate.time = ALARM_TIME_HR_MIN_SEC;
+ 105:main.c        ****     alarmTimeDate.date = ALARM_DATE_MONTH_DAY_YEAR;
+ 106:main.c        ****     
+ 107:main.c        ****     /* Prepare COUNTER0 to use it by CySysTimerDelay function in
+ 108:main.c        ****      * "INTERRUPT" mode: disable "clear on match" functionality, configure
+ 109:main.c        ****      * COUNTER0 to generate interrupts on match.
+ 110:main.c        ****      */
+ 111:main.c        ****     CySysWdtSetClearOnMatch(CY_SYS_WDT_COUNTER0, 0u);
+ 112:main.c        ****     CySysWdtSetMode(CY_SYS_WDT_COUNTER0, CY_SYS_WDT_MODE_INT);
+ 113:main.c        ****     
+ 114:main.c        ****     /* Enable WDT COUNTER0 */
+ 115:main.c        ****     CySysWdtEnable(CY_SYS_WDT_COUNTER0_MASK);
+ 116:main.c        ****     
+ 117:main.c        ****     /* Disable servicing interrupts from WDT_COUNTER0 to prevent
+ 118:main.c        ****        trigger callback before the CySysTimerDelay() function. */
+ 119:main.c        ****     CySysWdtDisableCounterIsr(CY_SYS_WDT_COUNTER0);
+ 120:main.c        ****     
+ 121:main.c        ****     /* Register EnableRtcOperation() by the COUNTER0. */
+ 122:main.c        ****     CySysWdtSetInterruptCallback(CY_SYS_WDT_COUNTER0, EnableRtcOperation);
+ 123:main.c        ****     
+ 124:main.c        ****     /* Initiate run the EnableRtcOperation() callback in WCO_STARTUP_DELAY_CYCLES interval. */
+ 125:main.c        ****     CySysTimerDelay(CY_SYS_WDT_COUNTER0, CY_SYS_TIMER_INTERRUPT, WCO_STARTUP_DELAY_CYCLES);
+ 126:main.c        ****     
+ 127:main.c        ****     /* Start RTC component */
+ 128:main.c        ****     RTC_Start();
+ 129:main.c        ****     
+ 130:main.c        ****     /* Set Date and Time */
+ 131:main.c        ****     RTC_SetDateAndTime(TIME_HR_MIN_SEC,DATE_MONTH_DAY_YEAR);
+ 132:main.c        **** 
+ 133:main.c        ****     /* Ignore second mask to call alarm */
+ 134:main.c        ****     RTC_SetAlarmMask((uint32)~RTC_ALARM_SEC_MASK);
+ 135:main.c        ****     
+ 136:main.c        ****     /* Set Alarm Date and Time */
+ 137:main.c        ****     RTC_SetAlarmDateAndTime(&alarmTimeDate);
+ 138:main.c        **** 
+ 139:main.c        ****     /* Set RTC time update period */
+ 140:main.c        ****     //RTC_SetPeriod(1u, TICK_EACH_1_HZ);
+ 141:main.c        ****     //RTC_SetPeriod(1u,TICK_EACH_2_HZ);
+ 142:main.c        ****     RTC_SetPeriod(1u,TICK_EACH_10_HZ);
+ 143:main.c        ****     /* Set function AlarmIsrHandler to be called when alarm triggers */
+ 144:main.c        ****     RTC_SetAlarmHandler(AlarmIsrHandler);
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 4
+
+
+ 145:main.c        ****     
+ 146:main.c        ****     while(1)
+ 147:main.c        ****     {
+ 148:main.c        **** 
+ 149:main.c        ****         /* Get Date and Time from RTC */
+ 150:main.c        ****         time = RTC_GetTime();
+ 151:main.c        ****         date = RTC_GetDate();
+ 152:main.c        ****        /* Print Date and Time to UART */
+ 153:main.c        ****         sprintf(timeBuffer, "%02lu:%02lu:%02lu.%1lu", RTC_GetHours(time), RTC_GetMinutes(time), RTC
+ 154:main.c        ****         sprintf(dateBuffer, "%02lu/%02lu/%02lu", RTC_GetMonth(date), RTC_GetDay(date), RTC_GetYear(
+ 155:main.c        **** 
+ 156:main.c        ****         UART_PutString(timeBuffer);
+ 157:main.c        ****         UART_PutString(" | ");
+ 158:main.c        ****         UART_PutString(dateBuffer);
+ 159:main.c        ****         UART_PutString(" | ");
+ 160:main.c        **** 
+ 161:main.c        ****         if (alarmFlag == 1u)
+ 162:main.c        ****         {
+ 163:main.c        ****             UART_PutString("  Alarm ");
+ 164:main.c        ****             alarmFlag  = 0u;
+ 165:main.c        ****         }
+ 166:main.c        ****         else
+ 167:main.c        ****         {
+ 168:main.c        ****             UART_PutString("No alarm");
+ 169:main.c        ****         }
+ 170:main.c        **** 
+ 171:main.c        ****         UART_PutString("\r");
+ 172:main.c        **** 
+ 173:main.c        ****         /* Switch to Sleep Mode */
+ 174:main.c        ****         CySysPmDeepSleep();
+ 175:main.c        ****     }
+ 176:main.c        **** }
+ 177:main.c        **** 
+ 178:main.c        **** 
+ 179:main.c        **** /*******************************************************************************
+ 180:main.c        **** * Function Name: UpdateTimeIsrHandler
+ 181:main.c        **** ********************************************************************************
+ 182:main.c        **** * Summary: 
+ 183:main.c        **** *  This interrupt handler is intended to switch LFCLK source from ILO to WCO and
+ 184:main.c        **** *  enable RTC operation. 
+ 185:main.c        **** *
+ 186:main.c        **** * Parameters:
+ 187:main.c        **** *  None
+ 188:main.c        **** *
+ 189:main.c        **** * Return:
+ 190:main.c        **** *  None
+ 191:main.c        **** *
+ 192:main.c        **** *******************************************************************************/
+ 193:main.c        **** void EnableRtcOperation(void)
+ 194:main.c        **** {
+  28              		.loc 1 194 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 10B5     		push	{r4, lr}
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 4, -8
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 5
+
+
+  35              		.cfi_offset 14, -4
+ 195:main.c        ****     /* Switch LFCLK source from ILO to WCO. */
+ 196:main.c        ****     CySysClkSetLfclkSource(CY_SYS_CLK_LFCLK_SRC_WCO);
+  36              		.loc 1 196 0
+  37 0002 8020     		movs	r0, #128
+  38 0004 C005     		lsls	r0, r0, #23
+  39 0006 FFF7FEFF 		bl	CySysClkSetLfclkSource
+  40              	.LVL0:
+ 197:main.c        ****     
+ 198:main.c        ****     /* Configure COUNTER0 to generate interrupt every second. */
+ 199:main.c        ****     CySysWdtDisable(CY_SYS_WDT_COUNTER0_MASK);
+  41              		.loc 1 199 0
+  42 000a 0120     		movs	r0, #1
+  43 000c FFF7FEFF 		bl	CySysWdtDisable
+  44              	.LVL1:
+ 200:main.c        ****     CySysWdtSetClearOnMatch(CY_SYS_WDT_COUNTER0, 1u);
+  45              		.loc 1 200 0
+  46 0010 0121     		movs	r1, #1
+  47 0012 0020     		movs	r0, #0
+  48 0014 FFF7FEFF 		bl	CySysWdtSetClearOnMatch
+  49              	.LVL2:
+ 201:main.c        ****     CySysWdtSetMatch(CY_SYS_WDT_COUNTER0, LFCLK_CYCLES_PER_SECOND);
+  50              		.loc 1 201 0
+  51 0018 0849     		ldr	r1, .L2
+  52 001a 0020     		movs	r0, #0
+  53 001c FFF7FEFF 		bl	CySysWdtSetMatch
+  54              	.LVL3:
+ 202:main.c        ****     CySysWdtEnable(CY_SYS_WDT_COUNTER0_MASK);
+  55              		.loc 1 202 0
+  56 0020 0120     		movs	r0, #1
+  57 0022 FFF7FEFF 		bl	CySysWdtEnable
+  58              	.LVL4:
+ 203:main.c        ****     
+ 204:main.c        ****     /* Eegister UpdateTimeIsrHandler() by the COUNTER0. */
+ 205:main.c        ****     CySysWdtSetInterruptCallback(CY_SYS_WDT_COUNTER0, UpdateTimeIsrHandler);
+  59              		.loc 1 205 0
+  60 0026 0649     		ldr	r1, .L2+4
+  61 0028 0020     		movs	r0, #0
+  62 002a FFF7FEFF 		bl	CySysWdtSetInterruptCallback
+  63              	.LVL5:
+ 206:main.c        ****     
+ 207:main.c        ****     /* Enable the COUNTER0 ISR handler. */
+ 208:main.c        ****     CySysWdtEnableCounterIsr(CY_SYS_WDT_COUNTER0);
+  64              		.loc 1 208 0
+  65 002e 0020     		movs	r0, #0
+  66 0030 FFF7FEFF 		bl	CySysWdtEnableCounterIsr
+  67              	.LVL6:
+ 209:main.c        ****     
+ 210:main.c        ****     /* Configure the LFCLK_Out pin to drive it by LFCLK. */
+ 211:main.c        ****     LFCLK_Out_SetDriveMode(LFCLK_Out_DM_STRONG);
+  68              		.loc 1 211 0
+  69 0034 0620     		movs	r0, #6
+  70 0036 FFF7FEFF 		bl	LFCLK_Out_SetDriveMode
+  71              	.LVL7:
+ 212:main.c        **** }
+  72              		.loc 1 212 0
+  73              		@ sp needed
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 6
+
+
+  74 003a 10BD     		pop	{r4, pc}
+  75              	.L3:
+  76              		.align	2
+  77              	.L2:
+  78 003c CC0C0000 		.word	3276
+  79 0040 00000000 		.word	UpdateTimeIsrHandler
+  80              		.cfi_endproc
+  81              	.LFE64:
+  82              		.size	EnableRtcOperation, .-EnableRtcOperation
+  83              		.section	.text.UpdateTimeIsrHandler,"ax",%progbits
+  84              		.align	2
+  85              		.global	UpdateTimeIsrHandler
+  86              		.code	16
+  87              		.thumb_func
+  88              		.type	UpdateTimeIsrHandler, %function
+  89              	UpdateTimeIsrHandler:
+  90              	.LFB65:
+ 213:main.c        **** 
+ 214:main.c        **** 
+ 215:main.c        **** /*******************************************************************************
+ 216:main.c        **** * Function Name: UpdateTimeIsrHandler
+ 217:main.c        **** ********************************************************************************
+ 218:main.c        **** * Summary: 
+ 219:main.c        **** *  The interrupt handler for WDT counter 0 interrupts. Toggles the LED_WdtIsr 
+ 220:main.c        **** *  pin.
+ 221:main.c        **** *
+ 222:main.c        **** * Parameters:
+ 223:main.c        **** *  None
+ 224:main.c        **** *
+ 225:main.c        **** * Return:
+ 226:main.c        **** *  None
+ 227:main.c        **** *
+ 228:main.c        **** *******************************************************************************/
+ 229:main.c        **** void UpdateTimeIsrHandler(void)
+ 230:main.c        **** {
+  91              		.loc 1 230 0
+  92              		.cfi_startproc
+  93              		@ args = 0, pretend = 0, frame = 0
+  94              		@ frame_needed = 0, uses_anonymous_args = 0
+  95 0000 10B5     		push	{r4, lr}
+  96              		.cfi_def_cfa_offset 8
+  97              		.cfi_offset 4, -8
+  98              		.cfi_offset 14, -4
+ 231:main.c        ****     /* Toggle pin state */
+ 232:main.c        ****     ui100mS++;
+  99              		.loc 1 232 0
+ 100 0002 094A     		ldr	r2, .L6
+ 101 0004 1368     		ldr	r3, [r2]
+ 102 0006 0133     		adds	r3, r3, #1
+ 103 0008 1360     		str	r3, [r2]
+ 233:main.c        ****     if(ui100mS>9)
+ 104              		.loc 1 233 0
+ 105 000a 092B     		cmp	r3, #9
+ 106 000c 02D9     		bls	.L5
+ 234:main.c        ****         ui100mS=0;
+ 107              		.loc 1 234 0
+ 108 000e 0022     		movs	r2, #0
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 7
+
+
+ 109 0010 054B     		ldr	r3, .L6
+ 110 0012 1A60     		str	r2, [r3]
+ 111              	.L5:
+ 235:main.c        ****     LED_WdtIsr_Write((uint8)~(LED_WdtIsr_Read()));
+ 112              		.loc 1 235 0
+ 113 0014 FFF7FEFF 		bl	LED_WdtIsr_Read
+ 114              	.LVL8:
+ 115 0018 C043     		mvns	r0, r0
+ 116 001a C0B2     		uxtb	r0, r0
+ 117 001c FFF7FEFF 		bl	LED_WdtIsr_Write
+ 118              	.LVL9:
+ 236:main.c        ****     RTC_Update();
+ 119              		.loc 1 236 0
+ 120 0020 FFF7FEFF 		bl	RTC_Update
+ 121              	.LVL10:
+ 237:main.c        **** }
+ 122              		.loc 1 237 0
+ 123              		@ sp needed
+ 124 0024 10BD     		pop	{r4, pc}
+ 125              	.L7:
+ 126 0026 C046     		.align	2
+ 127              	.L6:
+ 128 0028 00000000 		.word	.LANCHOR0
+ 129              		.cfi_endproc
+ 130              	.LFE65:
+ 131              		.size	UpdateTimeIsrHandler, .-UpdateTimeIsrHandler
+ 132              		.section	.text.AlarmIsrHandler,"ax",%progbits
+ 133              		.align	2
+ 134              		.global	AlarmIsrHandler
+ 135              		.code	16
+ 136              		.thumb_func
+ 137              		.type	AlarmIsrHandler, %function
+ 138              	AlarmIsrHandler:
+ 139              	.LFB66:
+ 238:main.c        **** 
+ 239:main.c        **** 
+ 240:main.c        **** /*******************************************************************************
+ 241:main.c        **** * Function Name: AlarmIsrHandler
+ 242:main.c        **** ********************************************************************************
+ 243:main.c        **** * Summary:
+ 244:main.c        **** *  The interrupt handler for Alarm interrupts. Toggles the LED_WdtInt pin.
+ 245:main.c        **** *
+ 246:main.c        **** * Parameters:
+ 247:main.c        **** *  None
+ 248:main.c        **** *
+ 249:main.c        **** * Return:
+ 250:main.c        **** *  None
+ 251:main.c        **** *
+ 252:main.c        **** *******************************************************************************/
+ 253:main.c        **** void AlarmIsrHandler(void)
+ 254:main.c        **** {
+ 140              		.loc 1 254 0
+ 141              		.cfi_startproc
+ 142              		@ args = 0, pretend = 0, frame = 0
+ 143              		@ frame_needed = 0, uses_anonymous_args = 0
+ 144 0000 10B5     		push	{r4, lr}
+ 145              		.cfi_def_cfa_offset 8
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 8
+
+
+ 146              		.cfi_offset 4, -8
+ 147              		.cfi_offset 14, -4
+ 255:main.c        ****     alarmFlag = 1u;
+ 148              		.loc 1 255 0
+ 149 0002 0122     		movs	r2, #1
+ 150 0004 054B     		ldr	r3, .L9
+ 151 0006 5A60     		str	r2, [r3, #4]
+ 256:main.c        **** 
+ 257:main.c        ****     /* Toggle pin state */
+ 258:main.c        ****      LED_Alarm_Write((uint8)~(LED_Alarm_Read()));
+ 152              		.loc 1 258 0
+ 153 0008 FFF7FEFF 		bl	LED_Alarm_Read
+ 154              	.LVL11:
+ 155 000c C043     		mvns	r0, r0
+ 156 000e C0B2     		uxtb	r0, r0
+ 157 0010 FFF7FEFF 		bl	LED_Alarm_Write
+ 158              	.LVL12:
+ 259:main.c        **** 
+ 260:main.c        ****     /* Clear interrupts state */
+ 261:main.c        ****     RTC_ClearAlarmStatus();
+ 159              		.loc 1 261 0
+ 160 0014 FFF7FEFF 		bl	RTC_ClearAlarmStatus
+ 161              	.LVL13:
+ 262:main.c        **** }
+ 162              		.loc 1 262 0
+ 163              		@ sp needed
+ 164 0018 10BD     		pop	{r4, pc}
+ 165              	.L10:
+ 166 001a C046     		.align	2
+ 167              	.L9:
+ 168 001c 00000000 		.word	.LANCHOR0
+ 169              		.cfi_endproc
+ 170              	.LFE66:
+ 171              		.size	AlarmIsrHandler, .-AlarmIsrHandler
+ 172              		.section	.text.main,"ax",%progbits
+ 173              		.align	2
+ 174              		.global	main
+ 175              		.code	16
+ 176              		.thumb_func
+ 177              		.type	main, %function
+ 178              	main:
+ 179              	.LFB63:
+  89:main.c        ****     char timeBuffer[16u];
+ 180              		.loc 1 89 0
+ 181              		.cfi_startproc
+ 182              		@ args = 0, pretend = 0, frame = 32
+ 183              		@ frame_needed = 0, uses_anonymous_args = 0
+ 184 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 185              		.cfi_def_cfa_offset 20
+ 186              		.cfi_offset 4, -20
+ 187              		.cfi_offset 5, -16
+ 188              		.cfi_offset 6, -12
+ 189              		.cfi_offset 7, -8
+ 190              		.cfi_offset 14, -4
+ 191 0002 4746     		mov	r7, r8
+ 192 0004 80B4     		push	{r7}
+ 193              		.cfi_def_cfa_offset 24
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 9
+
+
+ 194              		.cfi_offset 8, -24
+ 195 0006 8AB0     		sub	sp, sp, #40
+ 196              		.cfi_def_cfa_offset 64
+  98:main.c        ****     
+ 197              		.loc 1 98 0
+ 198 0008 FFF7FEFF 		bl	CySysClkWcoStart
+ 199              	.LVL14:
+ 101:main.c        **** 
+ 200              		.loc 1 101 0
+ 201              		.syntax divided
+ 202              	@ 101 "main.c" 1
+ 203 000c 62B6     		CPSIE   i
+ 204              	@ 0 "" 2
+ 104:main.c        ****     alarmTimeDate.date = ALARM_DATE_MONTH_DAY_YEAR;
+ 205              		.loc 1 104 0
+ 206              		.thumb
+ 207              		.syntax unified
+ 208 000e 524C     		ldr	r4, .L15
+ 209 0010 524B     		ldr	r3, .L15+4
+ 210 0012 2360     		str	r3, [r4]
+ 105:main.c        ****     
+ 211              		.loc 1 105 0
+ 212 0014 524D     		ldr	r5, .L15+8
+ 213 0016 6560     		str	r5, [r4, #4]
+ 111:main.c        ****     CySysWdtSetMode(CY_SYS_WDT_COUNTER0, CY_SYS_WDT_MODE_INT);
+ 214              		.loc 1 111 0
+ 215 0018 0021     		movs	r1, #0
+ 216 001a 0020     		movs	r0, #0
+ 217 001c FFF7FEFF 		bl	CySysWdtSetClearOnMatch
+ 218              	.LVL15:
+ 112:main.c        ****     
+ 219              		.loc 1 112 0
+ 220 0020 0121     		movs	r1, #1
+ 221 0022 0020     		movs	r0, #0
+ 222 0024 FFF7FEFF 		bl	CySysWdtSetMode
+ 223              	.LVL16:
+ 115:main.c        ****     
+ 224              		.loc 1 115 0
+ 225 0028 0120     		movs	r0, #1
+ 226 002a FFF7FEFF 		bl	CySysWdtEnable
+ 227              	.LVL17:
+ 119:main.c        ****     
+ 228              		.loc 1 119 0
+ 229 002e 0020     		movs	r0, #0
+ 230 0030 FFF7FEFF 		bl	CySysWdtDisableCounterIsr
+ 231              	.LVL18:
+ 122:main.c        ****     
+ 232              		.loc 1 122 0
+ 233 0034 4B49     		ldr	r1, .L15+12
+ 234 0036 0020     		movs	r0, #0
+ 235 0038 FFF7FEFF 		bl	CySysWdtSetInterruptCallback
+ 236              	.LVL19:
+ 125:main.c        ****     
+ 237              		.loc 1 125 0
+ 238 003c 4A4A     		ldr	r2, .L15+16
+ 239 003e 0121     		movs	r1, #1
+ 240 0040 0020     		movs	r0, #0
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 10
+
+
+ 241 0042 FFF7FEFF 		bl	CySysTimerDelay
+ 242              	.LVL20:
+ 128:main.c        ****     
+ 243              		.loc 1 128 0
+ 244 0046 FFF7FEFF 		bl	RTC_Start
+ 245              	.LVL21:
+ 131:main.c        **** 
+ 246              		.loc 1 131 0
+ 247 004a 2900     		movs	r1, r5
+ 248 004c 4748     		ldr	r0, .L15+20
+ 249 004e FFF7FEFF 		bl	RTC_SetDateAndTime
+ 250              	.LVL22:
+ 134:main.c        ****     
+ 251              		.loc 1 134 0
+ 252 0052 0220     		movs	r0, #2
+ 253 0054 4042     		rsbs	r0, r0, #0
+ 254 0056 FFF7FEFF 		bl	RTC_SetAlarmMask
+ 255              	.LVL23:
+ 137:main.c        **** 
+ 256              		.loc 1 137 0
+ 257 005a 2000     		movs	r0, r4
+ 258 005c FFF7FEFF 		bl	RTC_SetAlarmDateAndTime
+ 259              	.LVL24:
+ 142:main.c        ****     /* Set function AlarmIsrHandler to be called when alarm triggers */
+ 260              		.loc 1 142 0
+ 261 0060 0A21     		movs	r1, #10
+ 262 0062 0120     		movs	r0, #1
+ 263 0064 FFF7FEFF 		bl	RTC_SetPeriod
+ 264              	.LVL25:
+ 144:main.c        ****     
+ 265              		.loc 1 144 0
+ 266 0068 4148     		ldr	r0, .L15+24
+ 267 006a FFF7FEFF 		bl	RTC_SetAlarmHandler
+ 268              	.LVL26:
+ 269              	.L14:
+ 150:main.c        ****         date = RTC_GetDate();
+ 270              		.loc 1 150 0
+ 271 006e FFF7FEFF 		bl	RTC_GetTime
+ 272              	.LVL27:
+ 273 0072 0500     		movs	r5, r0
+ 274              	.LVL28:
+ 151:main.c        ****        /* Print Date and Time to UART */
+ 275              		.loc 1 151 0
+ 276 0074 FFF7FEFF 		bl	RTC_GetDate
+ 277              	.LVL29:
+ 278 0078 0400     		movs	r4, r0
+ 279              	.LVL30:
+ 280              	.LBB14:
+ 281              	.LBB15:
+ 282              		.file 2 "Generated_Source\\PSoC4/RTC.h"
+   1:Generated_Source\PSoC4/RTC.h **** /***************************************************************************//**
+   2:Generated_Source\PSoC4/RTC.h **** * \file Name: RTC.h
+   3:Generated_Source\PSoC4/RTC.h **** * \version 1.30
+   4:Generated_Source\PSoC4/RTC.h **** *
+   5:Generated_Source\PSoC4/RTC.h **** *  This file provides constants and parameter values for the RTC_P4 Component.
+   6:Generated_Source\PSoC4/RTC.h **** *
+   7:Generated_Source\PSoC4/RTC.h **** ********************************************************************************
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 11
+
+
+   8:Generated_Source\PSoC4/RTC.h **** * Copyright 2015-2017, Cypress Semiconductor Corporation.  All rights reserved.
+   9:Generated_Source\PSoC4/RTC.h **** * You may use this file only in accordance with the license, terms, conditions,
+  10:Generated_Source\PSoC4/RTC.h **** * disclaimers, and limitations in the end user license agreement accompanying
+  11:Generated_Source\PSoC4/RTC.h **** * the software package with which this file was provided.
+  12:Generated_Source\PSoC4/RTC.h **** *******************************************************************************/
+  13:Generated_Source\PSoC4/RTC.h **** 
+  14:Generated_Source\PSoC4/RTC.h **** #if !defined(CY_RTC_P4_RTC_H)
+  15:Generated_Source\PSoC4/RTC.h **** #define CY_RTC_P4_RTC_H
+  16:Generated_Source\PSoC4/RTC.h **** 
+  17:Generated_Source\PSoC4/RTC.h **** #include <cytypes.h>
+  18:Generated_Source\PSoC4/RTC.h **** #include <CyLib.h>
+  19:Generated_Source\PSoC4/RTC.h **** 
+  20:Generated_Source\PSoC4/RTC.h **** 
+  21:Generated_Source\PSoC4/RTC.h **** /*******************************************************************************
+  22:Generated_Source\PSoC4/RTC.h **** *    Data types definition
+  23:Generated_Source\PSoC4/RTC.h **** *******************************************************************************/
+  24:Generated_Source\PSoC4/RTC.h **** /**
+  25:Generated_Source\PSoC4/RTC.h **** * \addtogroup group_enums
+  26:Generated_Source\PSoC4/RTC.h **** * \{
+  27:Generated_Source\PSoC4/RTC.h **** */
+  28:Generated_Source\PSoC4/RTC.h **** /** Daylight saving Time format enumeration */
+  29:Generated_Source\PSoC4/RTC.h **** typedef enum
+  30:Generated_Source\PSoC4/RTC.h **** {
+  31:Generated_Source\PSoC4/RTC.h ****     RTC_DST_DATE_RELATIVE = 0u,  /**< Relative DST format */
+  32:Generated_Source\PSoC4/RTC.h ****     RTC_DST_DATE_FIXED = 1u      /**< Fixed DST format */
+  33:Generated_Source\PSoC4/RTC.h **** }RTC_DST_DATETYPE_ENUM;
+  34:Generated_Source\PSoC4/RTC.h **** /** \} group_enums */
+  35:Generated_Source\PSoC4/RTC.h **** 
+  36:Generated_Source\PSoC4/RTC.h **** /**
+  37:Generated_Source\PSoC4/RTC.h **** * \addtogroup group_structures
+  38:Generated_Source\PSoC4/RTC.h **** * \{
+  39:Generated_Source\PSoC4/RTC.h **** */
+  40:Generated_Source\PSoC4/RTC.h **** 
+  41:Generated_Source\PSoC4/RTC.h **** /** RTC_DATE_TIME structure is the data structure that is used to 
+  42:Generated_Source\PSoC4/RTC.h **** * save the current time and date (RTC_currentTimeDate), and Alarm time and date 
+  43:Generated_Source\PSoC4/RTC.h **** *(RTC_alarmCfgTimeDate)
+  44:Generated_Source\PSoC4/RTC.h **** *
+  45:Generated_Source\PSoC4/RTC.h **** */
+  46:Generated_Source\PSoC4/RTC.h **** typedef struct
+  47:Generated_Source\PSoC4/RTC.h **** {
+  48:Generated_Source\PSoC4/RTC.h ****     uint32 time;        /**< Time in the format used in API*/
+  49:Generated_Source\PSoC4/RTC.h ****     uint32 date;        /**< Date in the format used in API*/
+  50:Generated_Source\PSoC4/RTC.h ****     uint32 dayOfWeek;   /**< Day of the week, see \ref group_rtc_day_of_the_week */
+  51:Generated_Source\PSoC4/RTC.h ****     uint32 status;      /**< RTC status, see \ref group_rtc_status */
+  52:Generated_Source\PSoC4/RTC.h **** }RTC_DATE_TIME;
+  53:Generated_Source\PSoC4/RTC.h **** 
+  54:Generated_Source\PSoC4/RTC.h **** /*
+  55:Generated_Source\PSoC4/RTC.h **** * RTC_DST_TIME structure is the data structure that is used to 
+  56:Generated_Source\PSoC4/RTC.h **** * save time and date values for Daylight Savings Time Start and Stop 
+  57:Generated_Source\PSoC4/RTC.h **** * (RTC_dstTimeDateStart and RTC_dstTimeDateStop)
+  58:Generated_Source\PSoC4/RTC.h **** */
+  59:Generated_Source\PSoC4/RTC.h **** typedef struct
+  60:Generated_Source\PSoC4/RTC.h **** {
+  61:Generated_Source\PSoC4/RTC.h ****     uint32 hour;          /**< Hour value */
+  62:Generated_Source\PSoC4/RTC.h ****     uint32 dayOfWeek;     /**< Day of the week, see \ref group_rtc_day_of_the_week */
+  63:Generated_Source\PSoC4/RTC.h ****     uint32 dayOfMonth;    /**< Day of the month */
+  64:Generated_Source\PSoC4/RTC.h ****     uint32 weekOfMonth;   /**< Week of the month, see \ref group_rtc_dst_week_of_month */
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 12
+
+
+  65:Generated_Source\PSoC4/RTC.h ****     uint32 month;         /**< Month value, see \ref group_rtc_month */
+  66:Generated_Source\PSoC4/RTC.h ****     uint8  timeFormat;    /**< The DST operation mode, see \ref 
+  67:Generated_Source\PSoC4/RTC.h ****                                RTC_DST_DATETYPE_ENUM */
+  68:Generated_Source\PSoC4/RTC.h **** }RTC_DST_TIME;
+  69:Generated_Source\PSoC4/RTC.h **** /** \} group_structures */
+  70:Generated_Source\PSoC4/RTC.h **** 
+  71:Generated_Source\PSoC4/RTC.h **** /*******************************************************************************
+  72:Generated_Source\PSoC4/RTC.h **** *    Enumerated Types and Parameters
+  73:Generated_Source\PSoC4/RTC.h **** *******************************************************************************/
+  74:Generated_Source\PSoC4/RTC.h **** /* Time Format setting constants */
+  75:Generated_Source\PSoC4/RTC.h **** #define RTC__HOUR_12 1
+  76:Generated_Source\PSoC4/RTC.h **** #define RTC__HOUR_24 0
+  77:Generated_Source\PSoC4/RTC.h **** 
+  78:Generated_Source\PSoC4/RTC.h **** /*  Date Format setting constants */
+  79:Generated_Source\PSoC4/RTC.h **** #define RTC__MM_DD_YYYY 0
+  80:Generated_Source\PSoC4/RTC.h **** #define RTC__DD_MM_YYYY 1
+  81:Generated_Source\PSoC4/RTC.h **** #define RTC__YYYY_MM_DD 2
+  82:Generated_Source\PSoC4/RTC.h **** 
+  83:Generated_Source\PSoC4/RTC.h **** /* Date Type setting constants */
+  84:Generated_Source\PSoC4/RTC.h **** #define RTC__RELATIVE 0
+  85:Generated_Source\PSoC4/RTC.h **** #define RTC__FIXED 1
+  86:Generated_Source\PSoC4/RTC.h **** 
+  87:Generated_Source\PSoC4/RTC.h **** /* DST Hour setting constants */
+  88:Generated_Source\PSoC4/RTC.h **** #define RTC__H0000 0
+  89:Generated_Source\PSoC4/RTC.h **** #define RTC__H0100 1
+  90:Generated_Source\PSoC4/RTC.h **** #define RTC__H0200 2
+  91:Generated_Source\PSoC4/RTC.h **** #define RTC__H0300 3
+  92:Generated_Source\PSoC4/RTC.h **** #define RTC__H0400 4
+  93:Generated_Source\PSoC4/RTC.h **** #define RTC__H0500 5
+  94:Generated_Source\PSoC4/RTC.h **** #define RTC__H0600 6
+  95:Generated_Source\PSoC4/RTC.h **** #define RTC__H0700 7
+  96:Generated_Source\PSoC4/RTC.h **** #define RTC__H0800 8
+  97:Generated_Source\PSoC4/RTC.h **** #define RTC__H0900 9
+  98:Generated_Source\PSoC4/RTC.h **** #define RTC__H1000 10
+  99:Generated_Source\PSoC4/RTC.h **** #define RTC__H1100 11
+ 100:Generated_Source\PSoC4/RTC.h **** #define RTC__H1200 12
+ 101:Generated_Source\PSoC4/RTC.h **** #define RTC__H1300 13
+ 102:Generated_Source\PSoC4/RTC.h **** #define RTC__H1400 14
+ 103:Generated_Source\PSoC4/RTC.h **** #define RTC__H1500 15
+ 104:Generated_Source\PSoC4/RTC.h **** #define RTC__H1600 16
+ 105:Generated_Source\PSoC4/RTC.h **** #define RTC__H1700 17
+ 106:Generated_Source\PSoC4/RTC.h **** #define RTC__H1800 18
+ 107:Generated_Source\PSoC4/RTC.h **** #define RTC__H1900 19
+ 108:Generated_Source\PSoC4/RTC.h **** #define RTC__H2000 20
+ 109:Generated_Source\PSoC4/RTC.h **** #define RTC__H2100 21
+ 110:Generated_Source\PSoC4/RTC.h **** #define RTC__H2200 22
+ 111:Generated_Source\PSoC4/RTC.h **** #define RTC__H2300 23
+ 112:Generated_Source\PSoC4/RTC.h **** 
+ 113:Generated_Source\PSoC4/RTC.h **** /* DST DayOfWeek setting constants */
+ 114:Generated_Source\PSoC4/RTC.h **** #define RTC__SUNDAY 1
+ 115:Generated_Source\PSoC4/RTC.h **** #define RTC__MONDAY 2
+ 116:Generated_Source\PSoC4/RTC.h **** #define RTC__TUESDAY 3
+ 117:Generated_Source\PSoC4/RTC.h **** #define RTC__WEDNESDAY 4
+ 118:Generated_Source\PSoC4/RTC.h **** #define RTC__THURSDAY 5
+ 119:Generated_Source\PSoC4/RTC.h **** #define RTC__FRIDAY 6
+ 120:Generated_Source\PSoC4/RTC.h **** #define RTC__SATURDAY 7
+ 121:Generated_Source\PSoC4/RTC.h **** 
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 13
+
+
+ 122:Generated_Source\PSoC4/RTC.h **** /* DST Month setting constants */
+ 123:Generated_Source\PSoC4/RTC.h **** #define RTC__JAN 1
+ 124:Generated_Source\PSoC4/RTC.h **** #define RTC__FEB 2
+ 125:Generated_Source\PSoC4/RTC.h **** #define RTC__MAR 3
+ 126:Generated_Source\PSoC4/RTC.h **** #define RTC__APR 4
+ 127:Generated_Source\PSoC4/RTC.h **** #define RTC__MAY 5
+ 128:Generated_Source\PSoC4/RTC.h **** #define RTC__JUN 6
+ 129:Generated_Source\PSoC4/RTC.h **** #define RTC__JUL 7
+ 130:Generated_Source\PSoC4/RTC.h **** #define RTC__AUG 8
+ 131:Generated_Source\PSoC4/RTC.h **** #define RTC__SEP 9
+ 132:Generated_Source\PSoC4/RTC.h **** #define RTC__OCT 10
+ 133:Generated_Source\PSoC4/RTC.h **** #define RTC__NOV 11
+ 134:Generated_Source\PSoC4/RTC.h **** #define RTC__DEC 12
+ 135:Generated_Source\PSoC4/RTC.h **** 
+ 136:Generated_Source\PSoC4/RTC.h **** /* DST WeekOfMonth setting constants */
+ 137:Generated_Source\PSoC4/RTC.h **** #define RTC__FIRST 1
+ 138:Generated_Source\PSoC4/RTC.h **** #define RTC__SECOND 2
+ 139:Generated_Source\PSoC4/RTC.h **** #define RTC__THIRD 3
+ 140:Generated_Source\PSoC4/RTC.h **** #define RTC__FOURTH 4
+ 141:Generated_Source\PSoC4/RTC.h **** #define RTC__FIFTH 5
+ 142:Generated_Source\PSoC4/RTC.h **** #define RTC__LAST 6
+ 143:Generated_Source\PSoC4/RTC.h **** 
+ 144:Generated_Source\PSoC4/RTC.h **** 
+ 145:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_DATA_FORMAT     (0u)
+ 146:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_TIME_FORMAT     (0u)
+ 147:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_UPDATE_MODE     (0u)
+ 148:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_SECOND          (0u)
+ 149:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_MINUTE          (0u)
+ 150:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_HOUR            (0u)
+ 151:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_DAY             (1u)
+ 152:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_MONTH           (1u)
+ 153:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_YEAR            (1970u)
+ 154:Generated_Source\PSoC4/RTC.h **** 
+ 155:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_ALARM_STATUS    (1u)
+ 156:Generated_Source\PSoC4/RTC.h **** 
+ 157:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_DST_STATUS      (1u)
+ 158:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_DST_DATE_TYPE   (1u)
+ 159:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_DST_START_MONTH (3uL)
+ 160:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_DST_START_WOM   (6uL)
+ 161:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_DST_START_DOM   (22uL)
+ 162:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_DST_START_DOW   (1uL)
+ 163:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_DST_START_HRS   (3uL)
+ 164:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_DST_STOP_MONTH  (10uL)
+ 165:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_DST_STOP_DOM    (22uL)
+ 166:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_DST_STOP_DOW    (1uL)
+ 167:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_DST_STOP_WOM    (6uL)
+ 168:Generated_Source\PSoC4/RTC.h **** #define RTC_INITIAL_DST_STOP_HRS    (3uL)
+ 169:Generated_Source\PSoC4/RTC.h **** 
+ 170:Generated_Source\PSoC4/RTC.h **** /**
+ 171:Generated_Source\PSoC4/RTC.h **** * \addtogroup group_constants
+ 172:Generated_Source\PSoC4/RTC.h **** * \{
+ 173:Generated_Source\PSoC4/RTC.h **** */
+ 174:Generated_Source\PSoC4/RTC.h **** 
+ 175:Generated_Source\PSoC4/RTC.h **** /**
+ 176:Generated_Source\PSoC4/RTC.h **** * \defgroup group_rtc_day_of_the_week Day of the week definitions
+ 177:Generated_Source\PSoC4/RTC.h **** * \{
+ 178:Generated_Source\PSoC4/RTC.h **** * Definitions of days in the week
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 14
+
+
+ 179:Generated_Source\PSoC4/RTC.h **** */
+ 180:Generated_Source\PSoC4/RTC.h **** #define RTC_SUNDAY     (RTC__SUNDAY)       /**< Sequential number of Sunday in the week */
+ 181:Generated_Source\PSoC4/RTC.h **** #define RTC_MONDAY     (RTC__MONDAY)       /**< Sequential number of Monday in the week */
+ 182:Generated_Source\PSoC4/RTC.h **** #define RTC_TUESDAY    (RTC__TUESDAY)      /**< Sequential number of Tuesday in the week */
+ 183:Generated_Source\PSoC4/RTC.h **** #define RTC_WEDNESDAY  (RTC__WEDNESDAY)    /**< Sequential number of Wednesday in the week */
+ 184:Generated_Source\PSoC4/RTC.h **** #define RTC_THURSDAY   (RTC__THURSDAY)     /**< Sequential number of Thursday in the week */
+ 185:Generated_Source\PSoC4/RTC.h **** #define RTC_FRIDAY     (RTC__FRIDAY)       /**< Sequential number of Friday in the week */
+ 186:Generated_Source\PSoC4/RTC.h **** #define RTC_SATURDAY   (RTC__SATURDAY)     /**< Sequential number of Saturday in the week */
+ 187:Generated_Source\PSoC4/RTC.h **** /** \} group_rtc_day_of_the_week */
+ 188:Generated_Source\PSoC4/RTC.h **** 
+ 189:Generated_Source\PSoC4/RTC.h **** /**
+ 190:Generated_Source\PSoC4/RTC.h **** * \defgroup group_rtc_dst_week_of_month DST Week of month setting constants definitions
+ 191:Generated_Source\PSoC4/RTC.h **** * \{
+ 192:Generated_Source\PSoC4/RTC.h **** * Week of month setting constants definitions for Daylight Saving Time feature
+ 193:Generated_Source\PSoC4/RTC.h **** */
+ 194:Generated_Source\PSoC4/RTC.h **** #define RTC_FIRST      (RTC__FIRST)   /**< First week in the month */
+ 195:Generated_Source\PSoC4/RTC.h **** #define RTC_SECOND     (RTC__SECOND)  /**< Second week in the month  */
+ 196:Generated_Source\PSoC4/RTC.h **** #define RTC_THIRD      (RTC__THIRD)   /**< Third week in the month  */
+ 197:Generated_Source\PSoC4/RTC.h **** #define RTC_FOURTH     (RTC__FOURTH)  /**< Fourth week in the month  */
+ 198:Generated_Source\PSoC4/RTC.h **** #define RTC_FIFTH      (RTC__FIFTH)   /**< Fifth week in the month  */
+ 199:Generated_Source\PSoC4/RTC.h **** #define RTC_LAST       (RTC__LAST)    /**< Last week in the month  */
+ 200:Generated_Source\PSoC4/RTC.h **** /** \} group_rtc_dst_week_of_month */
+ 201:Generated_Source\PSoC4/RTC.h **** 
+ 202:Generated_Source\PSoC4/RTC.h **** /**
+ 203:Generated_Source\PSoC4/RTC.h **** * \defgroup group_rtc_month Month definitions
+ 204:Generated_Source\PSoC4/RTC.h **** * \{
+ 205:Generated_Source\PSoC4/RTC.h **** * Constants definition for Months
+ 206:Generated_Source\PSoC4/RTC.h **** */
+ 207:Generated_Source\PSoC4/RTC.h **** #define RTC_JANUARY    (RTC__JAN)    /**< Sequential number of January in the year */
+ 208:Generated_Source\PSoC4/RTC.h **** #define RTC_FEBRUARY   (RTC__FEB)    /**< Sequential number of February in the year */
+ 209:Generated_Source\PSoC4/RTC.h **** #define RTC_MARCH      (RTC__MAR)    /**< Sequential number of March in the year */
+ 210:Generated_Source\PSoC4/RTC.h **** #define RTC_APRIL      (RTC__APR)    /**< Sequential number of April in the year */
+ 211:Generated_Source\PSoC4/RTC.h **** #define RTC_MAY        (RTC__MAY)    /**< Sequential number of May in the year */
+ 212:Generated_Source\PSoC4/RTC.h **** #define RTC_JUNE       (RTC__JUN)    /**< Sequential number of June in the year */
+ 213:Generated_Source\PSoC4/RTC.h **** #define RTC_JULY       (RTC__JUL)    /**< Sequential number of July in the year */
+ 214:Generated_Source\PSoC4/RTC.h **** #define RTC_AUGUST     (RTC__AUG)    /**< Sequential number of August in the year */
+ 215:Generated_Source\PSoC4/RTC.h **** #define RTC_SEPTEMBER  (RTC__SEP)    /**< Sequential number of September in the year */
+ 216:Generated_Source\PSoC4/RTC.h **** #define RTC_OCTOBER    (RTC__OCT)    /**< Sequential number of October in the year */
+ 217:Generated_Source\PSoC4/RTC.h **** #define RTC_NOVEMBER   (RTC__NOV)    /**< Sequential number of November in the year */
+ 218:Generated_Source\PSoC4/RTC.h **** #define RTC_DECEMBER   (RTC__DEC)    /**< Sequential number of December in the year */
+ 219:Generated_Source\PSoC4/RTC.h **** /** \} group_rtc_month */
+ 220:Generated_Source\PSoC4/RTC.h **** 
+ 221:Generated_Source\PSoC4/RTC.h **** /**
+ 222:Generated_Source\PSoC4/RTC.h **** * \defgroup group_rtc_am_pm AM/PM status definitions
+ 223:Generated_Source\PSoC4/RTC.h **** * \{
+ 224:Generated_Source\PSoC4/RTC.h **** * Definitions for 12 hour format for indicating the AM/PM period of day
+ 225:Generated_Source\PSoC4/RTC.h **** */
+ 226:Generated_Source\PSoC4/RTC.h **** #define RTC_AM                 (0u)    /**< AM period of day */
+ 227:Generated_Source\PSoC4/RTC.h **** #define RTC_PM                 (1u)    /**< PM period of day */
+ 228:Generated_Source\PSoC4/RTC.h **** /** \} group_rtc_am_pm */
+ 229:Generated_Source\PSoC4/RTC.h **** 
+ 230:Generated_Source\PSoC4/RTC.h **** /**
+ 231:Generated_Source\PSoC4/RTC.h **** * \defgroup group_rtc_hour_format Hour format definitions
+ 232:Generated_Source\PSoC4/RTC.h **** * \{
+ 233:Generated_Source\PSoC4/RTC.h **** * Definitions for hour format
+ 234:Generated_Source\PSoC4/RTC.h **** */
+ 235:Generated_Source\PSoC4/RTC.h **** #define RTC_12_HOURS_FORMAT    (RTC__HOUR_12) /**< The 12 hour (AM/PM) format */
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 15
+
+
+ 236:Generated_Source\PSoC4/RTC.h **** #define RTC_24_HOURS_FORMAT    (RTC__HOUR_24) /**< The 24 hour format */
+ 237:Generated_Source\PSoC4/RTC.h **** /** \} group_rtc_hour_format */
+ 238:Generated_Source\PSoC4/RTC.h **** 
+ 239:Generated_Source\PSoC4/RTC.h **** /**
+ 240:Generated_Source\PSoC4/RTC.h **** * \defgroup group_rtc_days_in_month Number of days in month definitions
+ 241:Generated_Source\PSoC4/RTC.h **** * \{
+ 242:Generated_Source\PSoC4/RTC.h **** * Definition of days in current month
+ 243:Generated_Source\PSoC4/RTC.h **** */
+ 244:Generated_Source\PSoC4/RTC.h **** #define RTC_DAYS_IN_JANUARY     (31u)    /**< Number of days in January  */
+ 245:Generated_Source\PSoC4/RTC.h **** #define RTC_DAYS_IN_FEBRUARY    (28u)    /**< Number of days in February */
+ 246:Generated_Source\PSoC4/RTC.h **** #define RTC_DAYS_IN_MARCH       (31u)    /**< Number of days in March */
+ 247:Generated_Source\PSoC4/RTC.h **** #define RTC_DAYS_IN_APRIL       (30u)    /**< Number of days in April */
+ 248:Generated_Source\PSoC4/RTC.h **** #define RTC_DAYS_IN_MAY         (31u)    /**< Number of days in May */
+ 249:Generated_Source\PSoC4/RTC.h **** #define RTC_DAYS_IN_JUNE        (30u)    /**< Number of days in June */
+ 250:Generated_Source\PSoC4/RTC.h **** #define RTC_DAYS_IN_JULY        (31u)    /**< Number of days in July */
+ 251:Generated_Source\PSoC4/RTC.h **** #define RTC_DAYS_IN_AUGUST      (31u)    /**< Number of days in August */
+ 252:Generated_Source\PSoC4/RTC.h **** #define RTC_DAYS_IN_SEPTEMBER   (30u)    /**< Number of days in September */
+ 253:Generated_Source\PSoC4/RTC.h **** #define RTC_DAYS_IN_OCTOBER     (31u)    /**< Number of days in October */
+ 254:Generated_Source\PSoC4/RTC.h **** #define RTC_DAYS_IN_NOVEMBER    (30u)    /**< Number of days in November */
+ 255:Generated_Source\PSoC4/RTC.h **** #define RTC_DAYS_IN_DECEMBER    (31u)    /**< Number of days in December */
+ 256:Generated_Source\PSoC4/RTC.h **** /** \} group_rtc_days_in_month */
+ 257:Generated_Source\PSoC4/RTC.h **** 
+ 258:Generated_Source\PSoC4/RTC.h **** /**
+ 259:Generated_Source\PSoC4/RTC.h **** * \defgroup group_rtc_status Definitions of the RTC status values
+ 260:Generated_Source\PSoC4/RTC.h **** * \{
+ 261:Generated_Source\PSoC4/RTC.h **** * Definitions for status software register, which has flags for DST (DST),
+ 262:Generated_Source\PSoC4/RTC.h **** * Leap Year (LY), AM/PM (AM_PM).
+ 263:Generated_Source\PSoC4/RTC.h **** */
+ 264:Generated_Source\PSoC4/RTC.h **** 
+ 265:Generated_Source\PSoC4/RTC.h **** /** Status of Daylight Saving Time. This bit
+ 266:Generated_Source\PSoC4/RTC.h **** * goes high when the current time and date match the DST time and date and the 
+ 267:Generated_Source\PSoC4/RTC.h **** * time is incremented. This bit goes low after the DST interval and the time is 
+ 268:Generated_Source\PSoC4/RTC.h **** * decremented.
+ 269:Generated_Source\PSoC4/RTC.h **** */
+ 270:Generated_Source\PSoC4/RTC.h **** #define RTC_STATUS_DST     (1uL << RTC_STATUS_DST_OFFSET)
+ 271:Generated_Source\PSoC4/RTC.h **** 
+ 272:Generated_Source\PSoC4/RTC.h **** /** Status of Leap Year. This bit goes high when the current year is a leap year */
+ 273:Generated_Source\PSoC4/RTC.h **** #define RTC_STATUS_LY      (1uL << RTC_STATUS_LY_OFFSET)
+ 274:Generated_Source\PSoC4/RTC.h **** 
+ 275:Generated_Source\PSoC4/RTC.h **** /** Status of Current Time. This bit is low from midnight to noon and high from 
+ 276:Generated_Source\PSoC4/RTC.h **** *  noon to midnight. */
+ 277:Generated_Source\PSoC4/RTC.h **** #define RTC_STATUS_AM_PM   (1uL << RTC_STATUS_AM_PM_OFFSET)
+ 278:Generated_Source\PSoC4/RTC.h **** /** \} group_rtc_status */
+ 279:Generated_Source\PSoC4/RTC.h **** 
+ 280:Generated_Source\PSoC4/RTC.h **** /**
+ 281:Generated_Source\PSoC4/RTC.h **** * \defgroup group_rtc_alarm_mask Definitions for Alarm Mask software register
+ 282:Generated_Source\PSoC4/RTC.h **** * \{
+ 283:Generated_Source\PSoC4/RTC.h **** * Definitions for Alarm Mask software register. These masks allow 
+ 284:Generated_Source\PSoC4/RTC.h **** * matching the alarm value register with the current value register.
+ 285:Generated_Source\PSoC4/RTC.h **** */
+ 286:Generated_Source\PSoC4/RTC.h **** 
+ 287:Generated_Source\PSoC4/RTC.h **** /** The second alarm mask allows matching the alarm second register with the 
+ 288:Generated_Source\PSoC4/RTC.h **** *   current second register.
+ 289:Generated_Source\PSoC4/RTC.h **** */
+ 290:Generated_Source\PSoC4/RTC.h **** #define RTC_ALARM_SEC_MASK         (0x00000001uL)
+ 291:Generated_Source\PSoC4/RTC.h **** 
+ 292:Generated_Source\PSoC4/RTC.h **** /** The minute alarm mask allows matching the alarm minute register with the 
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 16
+
+
+ 293:Generated_Source\PSoC4/RTC.h **** *   current minute register.
+ 294:Generated_Source\PSoC4/RTC.h **** */
+ 295:Generated_Source\PSoC4/RTC.h **** #define RTC_ALARM_MIN_MASK         (0x00000002uL)
+ 296:Generated_Source\PSoC4/RTC.h **** 
+ 297:Generated_Source\PSoC4/RTC.h **** /** The hour alarm mask allows matching the alarm hour register with the 
+ 298:Generated_Source\PSoC4/RTC.h **** *   current hour register.
+ 299:Generated_Source\PSoC4/RTC.h **** */
+ 300:Generated_Source\PSoC4/RTC.h **** #define RTC_ALARM_HOUR_MASK        (0x00000004uL)
+ 301:Generated_Source\PSoC4/RTC.h **** 
+ 302:Generated_Source\PSoC4/RTC.h **** /** The day of the week alarm mask allows matching the alarm hour register with 
+ 303:Generated_Source\PSoC4/RTC.h **** *   the current day of the week register.
+ 304:Generated_Source\PSoC4/RTC.h **** */
+ 305:Generated_Source\PSoC4/RTC.h **** #define RTC_ALARM_DAYOFWEEK_MASK   (0x00000008uL)
+ 306:Generated_Source\PSoC4/RTC.h **** 
+ 307:Generated_Source\PSoC4/RTC.h **** /** The day of the Month alarm mask allows matching the alarm hour register with 
+ 308:Generated_Source\PSoC4/RTC.h **** *   the current day of the Month register.
+ 309:Generated_Source\PSoC4/RTC.h **** */
+ 310:Generated_Source\PSoC4/RTC.h **** #define RTC_ALARM_DAYOFMONTH_MASK  (0x00000010uL)
+ 311:Generated_Source\PSoC4/RTC.h **** 
+ 312:Generated_Source\PSoC4/RTC.h **** /** The month alarm mask allows matching the alarm hour register with the
+ 313:Generated_Source\PSoC4/RTC.h **** *   current month register.
+ 314:Generated_Source\PSoC4/RTC.h **** */
+ 315:Generated_Source\PSoC4/RTC.h **** #define RTC_ALARM_MONTH_MASK       (0x00000020uL)
+ 316:Generated_Source\PSoC4/RTC.h **** 
+ 317:Generated_Source\PSoC4/RTC.h **** /** The year alarm mask allows matching the alarm hour register with the
+ 318:Generated_Source\PSoC4/RTC.h **** *   current year register.
+ 319:Generated_Source\PSoC4/RTC.h **** */
+ 320:Generated_Source\PSoC4/RTC.h **** #define RTC_ALARM_YEAR_MASK        (0x00000040uL)
+ 321:Generated_Source\PSoC4/RTC.h **** 
+ 322:Generated_Source\PSoC4/RTC.h **** /** \} group_rtc_alarm_mask */
+ 323:Generated_Source\PSoC4/RTC.h **** /** \} group_constants */
+ 324:Generated_Source\PSoC4/RTC.h **** 
+ 325:Generated_Source\PSoC4/RTC.h **** #define RTC_DAYS_PER_WEEK       (7u)
+ 326:Generated_Source\PSoC4/RTC.h **** 
+ 327:Generated_Source\PSoC4/RTC.h **** #define RTC_MONTHS_PER_YEAR     (12uL)
+ 328:Generated_Source\PSoC4/RTC.h **** 
+ 329:Generated_Source\PSoC4/RTC.h **** #define RTC_HOURS_PER_DAY       (24uL)
+ 330:Generated_Source\PSoC4/RTC.h **** #define RTC_HOURS_PER_HALF_DAY  (12uL)
+ 331:Generated_Source\PSoC4/RTC.h **** 
+ 332:Generated_Source\PSoC4/RTC.h **** #define RTC_SECONDS_PER_MINUTE  (60uL)
+ 333:Generated_Source\PSoC4/RTC.h **** #define RTC_SECONDS_PER_HOUR    (3600uL)
+ 334:Generated_Source\PSoC4/RTC.h **** #define RTC_SECONDS_PER_DAY     (24uL * 3600uL)
+ 335:Generated_Source\PSoC4/RTC.h **** 
+ 336:Generated_Source\PSoC4/RTC.h **** #define RTC_SECONDS_PER_LEAP_YEAR    (366uL * 24uL * 3600uL)
+ 337:Generated_Source\PSoC4/RTC.h **** #define RTC_SECONDS_PER_NONLEAP_YEAR (365uL * 24uL * 3600uL)
+ 338:Generated_Source\PSoC4/RTC.h **** 
+ 339:Generated_Source\PSoC4/RTC.h **** #define RTC_UNIX_TIME_PM        ((12uL * 3600uL) + 1uL)
+ 340:Generated_Source\PSoC4/RTC.h **** 
+ 341:Generated_Source\PSoC4/RTC.h **** /* Unix time begins in 1970 year */
+ 342:Generated_Source\PSoC4/RTC.h **** #define RTC_YEAR_0             (1970u)
+ 343:Generated_Source\PSoC4/RTC.h **** 
+ 344:Generated_Source\PSoC4/RTC.h **** /* Definition of date register fields */
+ 345:Generated_Source\PSoC4/RTC.h **** #if(RTC_INITIAL_DATA_FORMAT == RTC__MM_DD_YYYY)
+ 346:Generated_Source\PSoC4/RTC.h ****     #define RTC_10_MONTH_OFFSET   (28u)
+ 347:Generated_Source\PSoC4/RTC.h ****     #define RTC_MONTH_OFFSET      (24u)
+ 348:Generated_Source\PSoC4/RTC.h ****     #define RTC_10_DAY_OFFSET     (20u)
+ 349:Generated_Source\PSoC4/RTC.h ****     #define RTC_DAY_OFFSET        (16u)
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 17
+
+
+ 350:Generated_Source\PSoC4/RTC.h ****     #define RTC_1000_YEAR_OFFSET  (12u)
+ 351:Generated_Source\PSoC4/RTC.h ****     #define RTC_100_YEAR_OFFSET   (8u)
+ 352:Generated_Source\PSoC4/RTC.h ****     #define RTC_10_YEAR_OFFSET    (4u)
+ 353:Generated_Source\PSoC4/RTC.h ****     #define RTC_YEAR_OFFSET       (0u)
+ 354:Generated_Source\PSoC4/RTC.h **** #elif(RTC_INITIAL_DATA_FORMAT == RTC__DD_MM_YYYY)
+ 355:Generated_Source\PSoC4/RTC.h ****     #define RTC_10_MONTH_OFFSET   (20u)
+ 356:Generated_Source\PSoC4/RTC.h ****     #define RTC_MONTH_OFFSET      (16u)
+ 357:Generated_Source\PSoC4/RTC.h ****     #define RTC_10_DAY_OFFSET     (28u)
+ 358:Generated_Source\PSoC4/RTC.h ****     #define RTC_DAY_OFFSET        (24u)
+ 359:Generated_Source\PSoC4/RTC.h ****     #define RTC_1000_YEAR_OFFSET  (12u)
+ 360:Generated_Source\PSoC4/RTC.h ****     #define RTC_100_YEAR_OFFSET   (8u)
+ 361:Generated_Source\PSoC4/RTC.h ****     #define RTC_10_YEAR_OFFSET    (4u)
+ 362:Generated_Source\PSoC4/RTC.h ****     #define RTC_YEAR_OFFSET       (0u)
+ 363:Generated_Source\PSoC4/RTC.h **** #else
+ 364:Generated_Source\PSoC4/RTC.h ****     #define RTC_10_MONTH_OFFSET   (12u)
+ 365:Generated_Source\PSoC4/RTC.h ****     #define RTC_MONTH_OFFSET      (8u)
+ 366:Generated_Source\PSoC4/RTC.h ****     #define RTC_10_DAY_OFFSET     (4u)
+ 367:Generated_Source\PSoC4/RTC.h ****     #define RTC_DAY_OFFSET        (0u)
+ 368:Generated_Source\PSoC4/RTC.h ****     #define RTC_1000_YEAR_OFFSET  (28u)
+ 369:Generated_Source\PSoC4/RTC.h ****     #define RTC_100_YEAR_OFFSET   (24u)
+ 370:Generated_Source\PSoC4/RTC.h ****     #define RTC_10_YEAR_OFFSET    (20u)
+ 371:Generated_Source\PSoC4/RTC.h ****     #define RTC_YEAR_OFFSET       (16u)
+ 372:Generated_Source\PSoC4/RTC.h **** #endif /* (RTC_INITIAL_DATA_FORMAT == RTC__MM_DD_YYYY) */
+ 373:Generated_Source\PSoC4/RTC.h **** 
+ 374:Generated_Source\PSoC4/RTC.h **** #define RTC_10_MONTH_MASK          (0x00000001uL << RTC_10_MONTH_OFFSET)
+ 375:Generated_Source\PSoC4/RTC.h **** #define RTC_MONTH_MASK             (0x0000000FuL << RTC_MONTH_OFFSET)
+ 376:Generated_Source\PSoC4/RTC.h **** #define RTC_10_DAY_MASK            (0x00000003uL << RTC_10_DAY_OFFSET)
+ 377:Generated_Source\PSoC4/RTC.h **** #define RTC_DAY_MASK               (0x0000000FuL << RTC_DAY_OFFSET)
+ 378:Generated_Source\PSoC4/RTC.h **** #define RTC_1000_YEAR_MASK         (0x00000003uL << RTC_1000_YEAR_OFFSET)
+ 379:Generated_Source\PSoC4/RTC.h **** #define RTC_100_YEAR_MASK          (0x0000000FuL << RTC_100_YEAR_OFFSET)
+ 380:Generated_Source\PSoC4/RTC.h **** #define RTC_10_YEAR_MASK           (0x0000000FuL << RTC_10_YEAR_OFFSET)
+ 381:Generated_Source\PSoC4/RTC.h **** #define RTC_YEAR_MASK              (0x0000000FuL << RTC_YEAR_OFFSET)
+ 382:Generated_Source\PSoC4/RTC.h **** 
+ 383:Generated_Source\PSoC4/RTC.h **** #define  RTC_MONTH_FULL_MASK       (RTC_10_MONTH_MASK  | RTC_MONTH_MASK)
+ 384:Generated_Source\PSoC4/RTC.h **** #define  RTC_DAY_FULL_MASK         (RTC_10_DAY_MASK    | RTC_DAY_MASK)
+ 385:Generated_Source\PSoC4/RTC.h **** #define  RTC_YEAR_FULL_MASK        (RTC_1000_YEAR_MASK | RTC_100_YEAR_MASK |\
+ 386:Generated_Source\PSoC4/RTC.h ****                                                  RTC_10_YEAR_MASK   | RTC_YEAR_MASK)
+ 387:Generated_Source\PSoC4/RTC.h **** 
+ 388:Generated_Source\PSoC4/RTC.h **** /* Definition of time register fields */
+ 389:Generated_Source\PSoC4/RTC.h **** #define RTC_TIME_FORMAT_OFFSET     (23u)
+ 390:Generated_Source\PSoC4/RTC.h **** #define RTC_PERIOD_OF_DAY_OFFSET   (22u)
+ 391:Generated_Source\PSoC4/RTC.h **** #define RTC_10_HOURS_OFFSET        (20u)
+ 392:Generated_Source\PSoC4/RTC.h **** #define RTC_HOURS_OFFSET           (16u)
+ 393:Generated_Source\PSoC4/RTC.h **** #define RTC_10_MINUTES_OFFSET      (12u)
+ 394:Generated_Source\PSoC4/RTC.h **** #define RTC_MINUTES_OFFSET         (8u)
+ 395:Generated_Source\PSoC4/RTC.h **** #define RTC_10_SECONDS_OFFSET      (4u)
+ 396:Generated_Source\PSoC4/RTC.h **** #define RTC_SECONDS_OFFSET         (0u)
+ 397:Generated_Source\PSoC4/RTC.h **** 
+ 398:Generated_Source\PSoC4/RTC.h **** #define RTC_TIME_FORMAT_MASK       (0x00000001uL << RTC_TIME_FORMAT_OFFSET)
+ 399:Generated_Source\PSoC4/RTC.h **** #define RTC_PERIOD_OF_DAY_MASK     (0x00000001uL << RTC_PERIOD_OF_DAY_OFFSET)
+ 400:Generated_Source\PSoC4/RTC.h **** #define RTC_10_HOURS_MASK          (0x00000003uL << RTC_10_HOURS_OFFSET)
+ 401:Generated_Source\PSoC4/RTC.h **** #define RTC_HOURS_MASK             (0x0000000FuL << RTC_HOURS_OFFSET)
+ 402:Generated_Source\PSoC4/RTC.h **** #define RTC_10_MINUTES_MASK        (0x00000007uL << RTC_10_MINUTES_OFFSET)
+ 403:Generated_Source\PSoC4/RTC.h **** #define RTC_MINUTES_MASK           (0x0000000FuL << RTC_MINUTES_OFFSET)
+ 404:Generated_Source\PSoC4/RTC.h **** #define RTC_10_SECONDS_MASK        (0x00000007uL << RTC_10_SECONDS_OFFSET)
+ 405:Generated_Source\PSoC4/RTC.h **** #define RTC_SECONDS_MASK           (0x0000000FuL << RTC_SECONDS_OFFSET)
+ 406:Generated_Source\PSoC4/RTC.h **** 
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 18
+
+
+ 407:Generated_Source\PSoC4/RTC.h **** #define RTC_HOURS_FULL_MASK        (RTC_10_HOURS_MASK   | RTC_HOURS_MASK)
+ 408:Generated_Source\PSoC4/RTC.h **** #define RTC_MINUTES_FULL_MASK      (RTC_10_MINUTES_MASK | RTC_MINUTES_MASK)
+ 409:Generated_Source\PSoC4/RTC.h **** #define RTC_SECONDS_FULL_MASK      (RTC_10_SECONDS_MASK | RTC_SECONDS_MASK)
+ 410:Generated_Source\PSoC4/RTC.h **** 
+ 411:Generated_Source\PSoC4/RTC.h **** #define RTC_STATUS_DST_OFFSET      (1u)
+ 412:Generated_Source\PSoC4/RTC.h **** #define RTC_STATUS_ALARM_OFFSET    (2u)
+ 413:Generated_Source\PSoC4/RTC.h **** #define RTC_STATUS_LY_OFFSET       (3u)
+ 414:Generated_Source\PSoC4/RTC.h **** #define RTC_STATUS_AM_PM_OFFSET    (4u)
+ 415:Generated_Source\PSoC4/RTC.h **** 
+ 416:Generated_Source\PSoC4/RTC.h **** /* Number of bits per one BCD digit */
+ 417:Generated_Source\PSoC4/RTC.h **** #define RTC_BCD_NUMBER_SIZE        (4u)
+ 418:Generated_Source\PSoC4/RTC.h **** #define RTC_BCD_ONE_DIGIT_MASK     (0x0000000FuL)
+ 419:Generated_Source\PSoC4/RTC.h **** 
+ 420:Generated_Source\PSoC4/RTC.h **** 
+ 421:Generated_Source\PSoC4/RTC.h **** /*******************************************************************************
+ 422:Generated_Source\PSoC4/RTC.h **** *    External Variables
+ 423:Generated_Source\PSoC4/RTC.h **** *******************************************************************************/
+ 424:Generated_Source\PSoC4/RTC.h **** /**
+ 425:Generated_Source\PSoC4/RTC.h **** * \addtogroup group_globals
+ 426:Generated_Source\PSoC4/RTC.h **** * \{
+ 427:Generated_Source\PSoC4/RTC.h **** */
+ 428:Generated_Source\PSoC4/RTC.h **** 
+ 429:Generated_Source\PSoC4/RTC.h **** /**
+ 430:Generated_Source\PSoC4/RTC.h **** * Indicates whether the RTC has been initialized; The variable is initialized to
+ 431:Generated_Source\PSoC4/RTC.h **** * 0 and set to 1 the first time RTC_Start() is called. This allows the component
+ 432:Generated_Source\PSoC4/RTC.h **** * to restart without reinitialization after the first call to the RTC_Start() 
+ 433:Generated_Source\PSoC4/RTC.h **** * routine.
+ 434:Generated_Source\PSoC4/RTC.h **** */
+ 435:Generated_Source\PSoC4/RTC.h **** extern uint8  RTC_initVar;
+ 436:Generated_Source\PSoC4/RTC.h **** 
+ 437:Generated_Source\PSoC4/RTC.h **** /** The DST start/stop status */
+ 438:Generated_Source\PSoC4/RTC.h **** extern uint8  RTC_dstStatus;
+ 439:Generated_Source\PSoC4/RTC.h **** 
+ 440:Generated_Source\PSoC4/RTC.h **** /**
+ 441:Generated_Source\PSoC4/RTC.h **** * The uint64 variable represents the standard Unix time (number of seconds 
+ 442:Generated_Source\PSoC4/RTC.h **** * elapsed from January 1, 1970 00:00 hours UTC) in 64-bit 
+ 443:Generated_Source\PSoC4/RTC.h **** */
+ 444:Generated_Source\PSoC4/RTC.h **** extern volatile uint64 RTC_unixTime;
+ 445:Generated_Source\PSoC4/RTC.h **** 
+ 446:Generated_Source\PSoC4/RTC.h **** /** The values for the time and date of the DST start */
+ 447:Generated_Source\PSoC4/RTC.h **** extern RTC_DST_TIME RTC_dstStartTime;
+ 448:Generated_Source\PSoC4/RTC.h **** 
+ 449:Generated_Source\PSoC4/RTC.h **** /** The values for the time and date of the DST stop */
+ 450:Generated_Source\PSoC4/RTC.h **** extern RTC_DST_TIME RTC_dstStopTime;
+ 451:Generated_Source\PSoC4/RTC.h **** 
+ 452:Generated_Source\PSoC4/RTC.h **** /**
+ 453:Generated_Source\PSoC4/RTC.h **** * The last updated time and date values are stored in this structure (update 
+ 454:Generated_Source\PSoC4/RTC.h **** * happens in Get time/date APIs)
+ 455:Generated_Source\PSoC4/RTC.h **** */
+ 456:Generated_Source\PSoC4/RTC.h **** extern RTC_DATE_TIME RTC_currentTimeDate;
+ 457:Generated_Source\PSoC4/RTC.h **** 
+ 458:Generated_Source\PSoC4/RTC.h **** /** The alarm time and date values are stored in this variable */
+ 459:Generated_Source\PSoC4/RTC.h **** extern RTC_DATE_TIME RTC_alarmCfgTimeDate;
+ 460:Generated_Source\PSoC4/RTC.h **** 
+ 461:Generated_Source\PSoC4/RTC.h **** /**
+ 462:Generated_Source\PSoC4/RTC.h **** * This variable is used to mask alarm events; mask seconds alarm, mask minutes 
+ 463:Generated_Source\PSoC4/RTC.h **** * alarm, and so on. It will have bit masks for each time item masking that item 
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 19
+
+
+ 464:Generated_Source\PSoC4/RTC.h **** * for alarm generation
+ 465:Generated_Source\PSoC4/RTC.h **** */
+ 466:Generated_Source\PSoC4/RTC.h **** extern uint32  RTC_alarmCfgMask;
+ 467:Generated_Source\PSoC4/RTC.h **** 
+ 468:Generated_Source\PSoC4/RTC.h **** /**
+ 469:Generated_Source\PSoC4/RTC.h **** * This variable is used to indicate current active alarm status per time item 
+ 470:Generated_Source\PSoC4/RTC.h **** * used in the alarm; whether seconds alarm is active, minute's alarm is active, 
+ 471:Generated_Source\PSoC4/RTC.h **** * and so on. It will have bit masks for each time item (seconds, minutes, hours,
+ 472:Generated_Source\PSoC4/RTC.h **** * day, and so on) showing the status
+ 473:Generated_Source\PSoC4/RTC.h **** */
+ 474:Generated_Source\PSoC4/RTC.h **** extern uint32 RTC_alarmCurStatus;
+ 475:Generated_Source\PSoC4/RTC.h **** 
+ 476:Generated_Source\PSoC4/RTC.h **** /** \} group_globals */
+ 477:Generated_Source\PSoC4/RTC.h **** 
+ 478:Generated_Source\PSoC4/RTC.h **** extern void (*RTC_alarmCallbackPtr)(void);
+ 479:Generated_Source\PSoC4/RTC.h **** 
+ 480:Generated_Source\PSoC4/RTC.h **** extern const uint16 RTC_daysBeforeMonthTbl[RTC_MONTHS_PER_YEAR];
+ 481:Generated_Source\PSoC4/RTC.h **** extern const uint8  RTC_daysInMonthTbl[RTC_MONTHS_PER_YEAR];
+ 482:Generated_Source\PSoC4/RTC.h **** 
+ 483:Generated_Source\PSoC4/RTC.h **** 
+ 484:Generated_Source\PSoC4/RTC.h **** /*******************************************************************************
+ 485:Generated_Source\PSoC4/RTC.h **** *    Function Prototypes
+ 486:Generated_Source\PSoC4/RTC.h **** *******************************************************************************/
+ 487:Generated_Source\PSoC4/RTC.h **** /**
+ 488:Generated_Source\PSoC4/RTC.h **** * \addtogroup group_general
+ 489:Generated_Source\PSoC4/RTC.h **** * \{
+ 490:Generated_Source\PSoC4/RTC.h **** */
+ 491:Generated_Source\PSoC4/RTC.h **** void   RTC_Start(void);
+ 492:Generated_Source\PSoC4/RTC.h **** void   RTC_Stop(void);
+ 493:Generated_Source\PSoC4/RTC.h **** void   RTC_Init(void);
+ 494:Generated_Source\PSoC4/RTC.h **** void   RTC_SetUnixTime(uint64 unixTime);
+ 495:Generated_Source\PSoC4/RTC.h **** uint64 RTC_GetUnixTime(void);
+ 496:Generated_Source\PSoC4/RTC.h **** void   RTC_SetPeriod(uint32 ticks, uint32 refOneSecTicks);
+ 497:Generated_Source\PSoC4/RTC.h **** uint32 RTC_GetPeriod(void);
+ 498:Generated_Source\PSoC4/RTC.h **** uint32 RTC_GetRefOneSec(void);
+ 499:Generated_Source\PSoC4/RTC.h **** void   RTC_SetDateAndTime(uint32 inputTime, uint32 inputDate);
+ 500:Generated_Source\PSoC4/RTC.h **** void   RTC_GetDateAndTime(RTC_DATE_TIME* dateTime);
+ 501:Generated_Source\PSoC4/RTC.h **** uint32 RTC_GetTime(void);
+ 502:Generated_Source\PSoC4/RTC.h **** uint32 RTC_GetDate(void);
+ 503:Generated_Source\PSoC4/RTC.h **** void   RTC_SetAlarmDateAndTime(const RTC_DATE_TIME* alarmTime);
+ 504:Generated_Source\PSoC4/RTC.h **** void   RTC_GetAlarmDateAndTime(RTC_DATE_TIME* alarmTimeDate);
+ 505:Generated_Source\PSoC4/RTC.h **** void   RTC_SetAlarmMask(uint32 mask);
+ 506:Generated_Source\PSoC4/RTC.h **** uint32 RTC_GetAlarmMask(void);
+ 507:Generated_Source\PSoC4/RTC.h **** uint32 RTC_ReadStatus(void);
+ 508:Generated_Source\PSoC4/RTC.h **** uint32 RTC_GetAlarmStatus(void);
+ 509:Generated_Source\PSoC4/RTC.h **** void   RTC_ClearAlarmStatus(void);
+ 510:Generated_Source\PSoC4/RTC.h **** void   RTC_SetDSTStartTime(const RTC_DST_TIME* dstStartTime,
+ 511:Generated_Source\PSoC4/RTC.h ****                                               RTC_DST_DATETYPE_ENUM type);
+ 512:Generated_Source\PSoC4/RTC.h **** void   RTC_SetDSTStopTime(const RTC_DST_TIME* dstStopTime,
+ 513:Generated_Source\PSoC4/RTC.h ****                                              RTC_DST_DATETYPE_ENUM type);
+ 514:Generated_Source\PSoC4/RTC.h **** uint32 RTC_ConvertBCDToDec(uint32 bcdNum);
+ 515:Generated_Source\PSoC4/RTC.h **** uint32 RTC_ConvertDecToBCD(uint32 decNum);
+ 516:Generated_Source\PSoC4/RTC.h **** void   RTC_Update(void);
+ 517:Generated_Source\PSoC4/RTC.h **** void*  RTC_SetAlarmHandler(void (*CallbackFunction)(void));
+ 518:Generated_Source\PSoC4/RTC.h **** 
+ 519:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_ConstructDate(uint32 month, uint32 day, uint32 year);
+ 520:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_ConstructTime(uint32 timeFormat, uint32 stateAmPm, uint32 hour, uint32 min, uint3
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 20
+
+
+ 521:Generated_Source\PSoC4/RTC.h **** /** \} group_general */
+ 522:Generated_Source\PSoC4/RTC.h **** 
+ 523:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_GetTimeFormat(uint32 inputTime);
+ 524:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_SetTimeFormat(uint32 inputTime, uint32 timeFormat);
+ 525:Generated_Source\PSoC4/RTC.h **** 
+ 526:Generated_Source\PSoC4/RTC.h **** /**
+ 527:Generated_Source\PSoC4/RTC.h **** * \addtogroup group_general
+ 528:Generated_Source\PSoC4/RTC.h **** * \{
+ 529:Generated_Source\PSoC4/RTC.h **** */
+ 530:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_LeapYear(uint32 year);
+ 531:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_IsBitSet(uint32 var, uint32 mask);
+ 532:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_GetSecond(uint32 inputTime);
+ 533:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_GetMinutes(uint32 inputTime);
+ 534:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_GetHours(uint32 inputTime);
+ 535:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_GetAmPm(uint32 inputTime);
+ 536:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_GetDay(uint32 date);
+ 537:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_GetMonth(uint32 date);
+ 538:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_GetYear(uint32 date);
+ 539:Generated_Source\PSoC4/RTC.h **** /** \} group_general */
+ 540:Generated_Source\PSoC4/RTC.h **** 
+ 541:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_SetSecond(uint32 inputTime, uint32 inputSecond);
+ 542:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_SetMinutes(uint32 inputTime, uint32 inputMinute);
+ 543:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_SetHours(uint32 inputTime, uint32 inputHours);
+ 544:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_SetAmPm(uint32 inputTime, uint32 periodOfDay);
+ 545:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_SetDay(uint32 inputDate, uint32 inputDay);
+ 546:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_SetMonth(uint32 inputDate, uint32 inputMonth);
+ 547:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_SetYear(uint32 inputDate, uint32 inputYear);
+ 548:Generated_Source\PSoC4/RTC.h **** 
+ 549:Generated_Source\PSoC4/RTC.h **** uint64 RTC_ConstructUnixAlarmTime(const RTC_DATE_TIME* alarmTime, uint8 alarmCfgMask);
+ 550:Generated_Source\PSoC4/RTC.h **** uint64 RTC_GetDstUnixTime(const RTC_DST_TIME* dstTime);
+ 551:Generated_Source\PSoC4/RTC.h **** uint64 RTC_GetNexAlarmTime(uint64 curUnixTime, uint8 alarmCfgMask);
+ 552:Generated_Source\PSoC4/RTC.h **** 
+ 553:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_GetNextMinSec(uint32 curVal);
+ 554:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_GetNextHour(uint32 curVal);
+ 555:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_GetNextDay(uint32 curYear, uint32 curMonth, uint32 curDay, uint32 alarmCfgMask);
+ 556:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_GetNextMonth(uint32 curMonth);
+ 557:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_GetNextYear(uint32 curYear);
+ 558:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_GetDayOfWeek(uint32 day, uint32 month, uint32 year);
+ 559:Generated_Source\PSoC4/RTC.h **** static uint32 RTC_DaysBeforeMonth(uint32 month, uint32 year);
+ 560:Generated_Source\PSoC4/RTC.h **** 
+ 561:Generated_Source\PSoC4/RTC.h **** uint32 RTC_DaysInMonth(uint32 month, uint32 year);
+ 562:Generated_Source\PSoC4/RTC.h **** 
+ 563:Generated_Source\PSoC4/RTC.h **** /**
+ 564:Generated_Source\PSoC4/RTC.h **** * \addtogroup group_general
+ 565:Generated_Source\PSoC4/RTC.h **** * \{
+ 566:Generated_Source\PSoC4/RTC.h **** */
+ 567:Generated_Source\PSoC4/RTC.h **** void   RTC_UnixToDateTime(RTC_DATE_TIME* dateTime, uint64 unixTime, uint32 timeFormat);
+ 568:Generated_Source\PSoC4/RTC.h **** uint64 RTC_DateTimeToUnix(uint32 inputDate, uint32 inputTime);
+ 569:Generated_Source\PSoC4/RTC.h **** 
+ 570:Generated_Source\PSoC4/RTC.h **** #if defined(CYDEV_RTC_SOURCE_WDT)
+ 571:Generated_Source\PSoC4/RTC.h ****     #if((0u != CYDEV_WDT_GENERATE_ISR) && (0u == RTC_INITIAL_UPDATE_MODE))
+ 572:Generated_Source\PSoC4/RTC.h ****         static void RTC_CySysRtcSetCallback(uint32 wdtNumber);
+ 573:Generated_Source\PSoC4/RTC.h ****         static void RTC_CySysRtcResetCallback(uint32 wdtNumber);
+ 574:Generated_Source\PSoC4/RTC.h ****     #endif /* ((0u != CYDEV_WDT_GENERATE_ISR) && (0u == RTC_INITIAL_UPDATE_MODE)) */
+ 575:Generated_Source\PSoC4/RTC.h **** #endif /* (CYDEV_RTC_SOURCE_WDT) */
+ 576:Generated_Source\PSoC4/RTC.h **** 
+ 577:Generated_Source\PSoC4/RTC.h **** /** \} group_general */
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 21
+
+
+ 578:Generated_Source\PSoC4/RTC.h **** 
+ 579:Generated_Source\PSoC4/RTC.h **** uint32 RTC_RelativeToFixed(uint32 dayOfWeek, uint32 weekOfMonth, uint32 month, uint32 year);
+ 580:Generated_Source\PSoC4/RTC.h **** 
+ 581:Generated_Source\PSoC4/RTC.h **** 
+ 582:Generated_Source\PSoC4/RTC.h **** 
+ 583:Generated_Source\PSoC4/RTC.h **** /*******************************************************************************
+ 584:Generated_Source\PSoC4/RTC.h **** * Function Name: RTC_IsBitSet
+ 585:Generated_Source\PSoC4/RTC.h **** ****************************************************************************//**
+ 586:Generated_Source\PSoC4/RTC.h **** *
+ 587:Generated_Source\PSoC4/RTC.h **** * Checks the state of a bit passed through parameter.
+ 588:Generated_Source\PSoC4/RTC.h **** *
+ 589:Generated_Source\PSoC4/RTC.h **** * \param var
+ 590:Generated_Source\PSoC4/RTC.h **** * The variable to be checked.
+ 591:Generated_Source\PSoC4/RTC.h **** *
+ 592:Generated_Source\PSoC4/RTC.h **** * \param mask
+ 593:Generated_Source\PSoC4/RTC.h **** * The mask for a bit to be checked.
+ 594:Generated_Source\PSoC4/RTC.h **** *
+ 595:Generated_Source\PSoC4/RTC.h **** * \return
+ 596:Generated_Source\PSoC4/RTC.h **** *  0u - Bit is not set. <br> 1u - Bit is set.
+ 597:Generated_Source\PSoC4/RTC.h **** *
+ 598:Generated_Source\PSoC4/RTC.h **** *******************************************************************************/
+ 599:Generated_Source\PSoC4/RTC.h **** static CY_INLINE uint32 RTC_IsBitSet(uint32 var, uint32 mask)
+ 600:Generated_Source\PSoC4/RTC.h **** {
+ 601:Generated_Source\PSoC4/RTC.h ****     return ((mask == (var & mask)) ? 1Lu : 0Lu);
+ 602:Generated_Source\PSoC4/RTC.h **** }
+ 603:Generated_Source\PSoC4/RTC.h **** 
+ 604:Generated_Source\PSoC4/RTC.h **** 
+ 605:Generated_Source\PSoC4/RTC.h **** /*******************************************************************************
+ 606:Generated_Source\PSoC4/RTC.h **** * Function Name: RTC_LeapYear
+ 607:Generated_Source\PSoC4/RTC.h **** ****************************************************************************//**
+ 608:Generated_Source\PSoC4/RTC.h **** *
+ 609:Generated_Source\PSoC4/RTC.h **** * Checks whether the year passed through the parameter is leap or no.
+ 610:Generated_Source\PSoC4/RTC.h **** *
+ 611:Generated_Source\PSoC4/RTC.h **** * \param year
+ 612:Generated_Source\PSoC4/RTC.h **** * The year to be checked.
+ 613:Generated_Source\PSoC4/RTC.h **** *
+ 614:Generated_Source\PSoC4/RTC.h **** * \return
+ 615:Generated_Source\PSoC4/RTC.h **** * 0u - The year is not leap <br> 1u - The year is leap.
+ 616:Generated_Source\PSoC4/RTC.h **** *
+ 617:Generated_Source\PSoC4/RTC.h **** *******************************************************************************/
+ 618:Generated_Source\PSoC4/RTC.h **** static CY_INLINE uint32 RTC_LeapYear(uint32 year)
+ 619:Generated_Source\PSoC4/RTC.h **** {
+ 620:Generated_Source\PSoC4/RTC.h ****     uint32 retVal;
+ 621:Generated_Source\PSoC4/RTC.h **** 
+ 622:Generated_Source\PSoC4/RTC.h ****     if(((0u == (year % 4Lu)) && (0u != (year % 100Lu))) || (0u == (year % 400Lu)))
+ 623:Generated_Source\PSoC4/RTC.h ****     {
+ 624:Generated_Source\PSoC4/RTC.h ****         retVal = 1uL;
+ 625:Generated_Source\PSoC4/RTC.h ****     }
+ 626:Generated_Source\PSoC4/RTC.h ****     else
+ 627:Generated_Source\PSoC4/RTC.h ****     {
+ 628:Generated_Source\PSoC4/RTC.h ****         retVal = 0uL;
+ 629:Generated_Source\PSoC4/RTC.h ****     }
+ 630:Generated_Source\PSoC4/RTC.h **** 
+ 631:Generated_Source\PSoC4/RTC.h ****     return(retVal);
+ 632:Generated_Source\PSoC4/RTC.h **** }
+ 633:Generated_Source\PSoC4/RTC.h **** 
+ 634:Generated_Source\PSoC4/RTC.h **** 
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 22
+
+
+ 635:Generated_Source\PSoC4/RTC.h **** /*******************************************************************************
+ 636:Generated_Source\PSoC4/RTC.h **** * Function Name: RTC_GetSecond
+ 637:Generated_Source\PSoC4/RTC.h **** ****************************************************************************//**
+ 638:Generated_Source\PSoC4/RTC.h **** *
+ 639:Generated_Source\PSoC4/RTC.h **** * Returns the seconds value from the time value that is passed as a/the 
+ 640:Generated_Source\PSoC4/RTC.h **** * parameter.
+ 641:Generated_Source\PSoC4/RTC.h **** *
+ 642:Generated_Source\PSoC4/RTC.h **** * \param inputTime
+ 643:Generated_Source\PSoC4/RTC.h **** * The time value.
+ 644:Generated_Source\PSoC4/RTC.h **** *
+ 645:Generated_Source\PSoC4/RTC.h **** * \return
+ 646:Generated_Source\PSoC4/RTC.h **** * The seconds value.
+ 647:Generated_Source\PSoC4/RTC.h **** *
+ 648:Generated_Source\PSoC4/RTC.h **** *******************************************************************************/
+ 649:Generated_Source\PSoC4/RTC.h **** static CY_INLINE uint32 RTC_GetSecond(uint32 inputTime)
+ 650:Generated_Source\PSoC4/RTC.h **** {
+ 651:Generated_Source\PSoC4/RTC.h ****     uint32 retVal;
+ 652:Generated_Source\PSoC4/RTC.h **** 
+ 653:Generated_Source\PSoC4/RTC.h ****     retVal  = ((inputTime & RTC_10_SECONDS_MASK) >> RTC_10_SECONDS_OFFSET) * 10u;
+ 654:Generated_Source\PSoC4/RTC.h ****     retVal += (inputTime & RTC_SECONDS_MASK) >> RTC_SECONDS_OFFSET;
+ 655:Generated_Source\PSoC4/RTC.h **** 
+ 656:Generated_Source\PSoC4/RTC.h ****     return (retVal);
+ 657:Generated_Source\PSoC4/RTC.h **** }
+ 658:Generated_Source\PSoC4/RTC.h **** 
+ 659:Generated_Source\PSoC4/RTC.h **** 
+ 660:Generated_Source\PSoC4/RTC.h **** /*******************************************************************************
+ 661:Generated_Source\PSoC4/RTC.h **** * Function Name: RTC_GetMinutes
+ 662:Generated_Source\PSoC4/RTC.h **** ****************************************************************************//**
+ 663:Generated_Source\PSoC4/RTC.h **** *
+ 664:Generated_Source\PSoC4/RTC.h **** * Returns the minutes value from the time value that is passed as a/the 
+ 665:Generated_Source\PSoC4/RTC.h **** * parameter.
+ 666:Generated_Source\PSoC4/RTC.h **** *
+ 667:Generated_Source\PSoC4/RTC.h **** * \param inputTime
+ 668:Generated_Source\PSoC4/RTC.h **** * The time value.
+ 669:Generated_Source\PSoC4/RTC.h **** *
+ 670:Generated_Source\PSoC4/RTC.h **** * \return
+ 671:Generated_Source\PSoC4/RTC.h **** * The minutes value.
+ 672:Generated_Source\PSoC4/RTC.h **** *
+ 673:Generated_Source\PSoC4/RTC.h **** *******************************************************************************/
+ 674:Generated_Source\PSoC4/RTC.h **** static CY_INLINE uint32 RTC_GetMinutes(uint32 inputTime)
+ 675:Generated_Source\PSoC4/RTC.h **** {
+ 676:Generated_Source\PSoC4/RTC.h ****     uint32 retVal;
+ 677:Generated_Source\PSoC4/RTC.h **** 
+ 678:Generated_Source\PSoC4/RTC.h ****     retVal  = ((inputTime & RTC_10_MINUTES_MASK) >> RTC_10_MINUTES_OFFSET) * 10u;
+ 679:Generated_Source\PSoC4/RTC.h ****     retVal += (inputTime & RTC_MINUTES_MASK) >> RTC_MINUTES_OFFSET;
+ 680:Generated_Source\PSoC4/RTC.h **** 
+ 681:Generated_Source\PSoC4/RTC.h ****     return (retVal);
+ 682:Generated_Source\PSoC4/RTC.h **** }
+ 683:Generated_Source\PSoC4/RTC.h **** 
+ 684:Generated_Source\PSoC4/RTC.h **** 
+ 685:Generated_Source\PSoC4/RTC.h **** /*******************************************************************************
+ 686:Generated_Source\PSoC4/RTC.h **** * Function Name: RTC_GetHours
+ 687:Generated_Source\PSoC4/RTC.h **** ****************************************************************************//**
+ 688:Generated_Source\PSoC4/RTC.h **** *
+ 689:Generated_Source\PSoC4/RTC.h **** * Returns the hours value from the time value that is passed as a/the parameter.
+ 690:Generated_Source\PSoC4/RTC.h **** *
+ 691:Generated_Source\PSoC4/RTC.h **** * \param inputTime
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 23
+
+
+ 692:Generated_Source\PSoC4/RTC.h **** * The time value.
+ 693:Generated_Source\PSoC4/RTC.h **** *
+ 694:Generated_Source\PSoC4/RTC.h **** * \return
+ 695:Generated_Source\PSoC4/RTC.h **** * The hours value.
+ 696:Generated_Source\PSoC4/RTC.h **** *
+ 697:Generated_Source\PSoC4/RTC.h **** *******************************************************************************/
+ 698:Generated_Source\PSoC4/RTC.h **** static CY_INLINE uint32 RTC_GetHours(uint32 inputTime)
+ 699:Generated_Source\PSoC4/RTC.h **** {
+ 700:Generated_Source\PSoC4/RTC.h ****     uint32 retVal;
+ 701:Generated_Source\PSoC4/RTC.h **** 
+ 702:Generated_Source\PSoC4/RTC.h ****     retVal  = ((inputTime & RTC_10_HOURS_MASK) >> RTC_10_HOURS_OFFSET) * 10u;
+ 283              		.loc 2 702 0
+ 284 007a 2B0D     		lsrs	r3, r5, #20
+ 285 007c 0322     		movs	r2, #3
+ 286 007e 9046     		mov	r8, r2
+ 287 0080 1340     		ands	r3, r2
+ 288 0082 9A00     		lsls	r2, r3, #2
+ 289 0084 D318     		adds	r3, r2, r3
+ 290 0086 5900     		lsls	r1, r3, #1
+ 291              	.LVL31:
+ 703:Generated_Source\PSoC4/RTC.h ****     retVal += (inputTime & RTC_HOURS_MASK) >> RTC_HOURS_OFFSET;
+ 292              		.loc 2 703 0
+ 293 0088 2A0C     		lsrs	r2, r5, #16
+ 294 008a 0F26     		movs	r6, #15
+ 295 008c 3240     		ands	r2, r6
+ 296 008e 8A18     		adds	r2, r1, r2
+ 297              	.LVL32:
+ 298              	.LBE15:
+ 299              	.LBE14:
+ 300              	.LBB16:
+ 301              	.LBB17:
+ 678:Generated_Source\PSoC4/RTC.h ****     retVal += (inputTime & RTC_MINUTES_MASK) >> RTC_MINUTES_OFFSET;
+ 302              		.loc 2 678 0
+ 303 0090 280B     		lsrs	r0, r5, #12
+ 304              	.LVL33:
+ 305 0092 0727     		movs	r7, #7
+ 306 0094 3840     		ands	r0, r7
+ 307 0096 8300     		lsls	r3, r0, #2
+ 308 0098 1818     		adds	r0, r3, r0
+ 309 009a 4100     		lsls	r1, r0, #1
+ 310              	.LVL34:
+ 679:Generated_Source\PSoC4/RTC.h **** 
+ 311              		.loc 2 679 0
+ 312 009c 2B0A     		lsrs	r3, r5, #8
+ 313 009e 3340     		ands	r3, r6
+ 314 00a0 CB18     		adds	r3, r1, r3
+ 315              	.LVL35:
+ 316              	.LBE17:
+ 317              	.LBE16:
+ 318              	.LBB18:
+ 319              	.LBB19:
+ 653:Generated_Source\PSoC4/RTC.h ****     retVal += (inputTime & RTC_SECONDS_MASK) >> RTC_SECONDS_OFFSET;
+ 320              		.loc 2 653 0
+ 321 00a2 2909     		lsrs	r1, r5, #4
+ 322 00a4 3940     		ands	r1, r7
+ 323 00a6 8800     		lsls	r0, r1, #2
+ 324 00a8 4118     		adds	r1, r0, r1
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 24
+
+
+ 325 00aa 4800     		lsls	r0, r1, #1
+ 326              	.LVL36:
+ 654:Generated_Source\PSoC4/RTC.h **** 
+ 327              		.loc 2 654 0
+ 328 00ac 3540     		ands	r5, r6
+ 329              	.LVL37:
+ 330 00ae 4519     		adds	r5, r0, r5
+ 331              	.LVL38:
+ 332              	.LBE19:
+ 333              	.LBE18:
+ 153:main.c        ****         sprintf(dateBuffer, "%02lu/%02lu/%02lu", RTC_GetMonth(date), RTC_GetDay(date), RTC_GetYear(
+ 334              		.loc 1 153 0
+ 335 00b0 304F     		ldr	r7, .L15+28
+ 336 00b2 3968     		ldr	r1, [r7]
+ 337 00b4 0191     		str	r1, [sp, #4]
+ 338 00b6 0095     		str	r5, [sp]
+ 339 00b8 2F49     		ldr	r1, .L15+32
+ 340 00ba 06A8     		add	r0, sp, #24
+ 341 00bc FFF7FEFF 		bl	sprintf
+ 342              	.LVL39:
+ 343              	.LBB20:
+ 344              	.LBB21:
+ 704:Generated_Source\PSoC4/RTC.h **** 
+ 705:Generated_Source\PSoC4/RTC.h ****     return (retVal);
+ 706:Generated_Source\PSoC4/RTC.h **** }
+ 707:Generated_Source\PSoC4/RTC.h **** 
+ 708:Generated_Source\PSoC4/RTC.h **** 
+ 709:Generated_Source\PSoC4/RTC.h **** /*******************************************************************************
+ 710:Generated_Source\PSoC4/RTC.h **** * Function Name: RTC_GetAmPm
+ 711:Generated_Source\PSoC4/RTC.h **** ****************************************************************************//**
+ 712:Generated_Source\PSoC4/RTC.h **** *
+ 713:Generated_Source\PSoC4/RTC.h **** * Returns the AM/PM status from the time value that is passed as parameter.
+ 714:Generated_Source\PSoC4/RTC.h **** *
+ 715:Generated_Source\PSoC4/RTC.h **** * \param inputTime
+ 716:Generated_Source\PSoC4/RTC.h **** * The time value.
+ 717:Generated_Source\PSoC4/RTC.h **** *
+ 718:Generated_Source\PSoC4/RTC.h **** * \return
+ 719:Generated_Source\PSoC4/RTC.h **** * The am/pm period of day, see \ref group_rtc_am_pm.
+ 720:Generated_Source\PSoC4/RTC.h **** *
+ 721:Generated_Source\PSoC4/RTC.h **** *******************************************************************************/
+ 722:Generated_Source\PSoC4/RTC.h **** static CY_INLINE uint32 RTC_GetAmPm(uint32 inputTime)
+ 723:Generated_Source\PSoC4/RTC.h **** {
+ 724:Generated_Source\PSoC4/RTC.h ****     return (RTC_IsBitSet(inputTime, RTC_PERIOD_OF_DAY_MASK));
+ 725:Generated_Source\PSoC4/RTC.h **** }
+ 726:Generated_Source\PSoC4/RTC.h **** 
+ 727:Generated_Source\PSoC4/RTC.h **** 
+ 728:Generated_Source\PSoC4/RTC.h **** /*******************************************************************************
+ 729:Generated_Source\PSoC4/RTC.h **** * Function Name: RTC_GetDay
+ 730:Generated_Source\PSoC4/RTC.h **** ****************************************************************************//**
+ 731:Generated_Source\PSoC4/RTC.h **** *
+ 732:Generated_Source\PSoC4/RTC.h **** * Returns the day value from the date value that is passed as parameter.
+ 733:Generated_Source\PSoC4/RTC.h **** *
+ 734:Generated_Source\PSoC4/RTC.h **** * \param date
+ 735:Generated_Source\PSoC4/RTC.h **** * The date value.
+ 736:Generated_Source\PSoC4/RTC.h **** *
+ 737:Generated_Source\PSoC4/RTC.h **** * \return
+ 738:Generated_Source\PSoC4/RTC.h **** * The day value.
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 25
+
+
+ 739:Generated_Source\PSoC4/RTC.h **** *
+ 740:Generated_Source\PSoC4/RTC.h **** *******************************************************************************/
+ 741:Generated_Source\PSoC4/RTC.h **** static CY_INLINE uint32 RTC_GetDay(uint32 date)
+ 742:Generated_Source\PSoC4/RTC.h **** {
+ 743:Generated_Source\PSoC4/RTC.h ****     uint32 retVal;
+ 744:Generated_Source\PSoC4/RTC.h **** 
+ 745:Generated_Source\PSoC4/RTC.h ****     retVal  = ((date & RTC_10_DAY_MASK) >> RTC_10_DAY_OFFSET) * 10u;
+ 746:Generated_Source\PSoC4/RTC.h ****     retVal += (date & RTC_DAY_MASK) >> RTC_DAY_OFFSET;
+ 747:Generated_Source\PSoC4/RTC.h **** 
+ 748:Generated_Source\PSoC4/RTC.h ****     return (retVal);
+ 749:Generated_Source\PSoC4/RTC.h **** }
+ 750:Generated_Source\PSoC4/RTC.h **** 
+ 751:Generated_Source\PSoC4/RTC.h **** 
+ 752:Generated_Source\PSoC4/RTC.h **** /*******************************************************************************
+ 753:Generated_Source\PSoC4/RTC.h **** * Function Name: RTC_GetMonth
+ 754:Generated_Source\PSoC4/RTC.h **** ****************************************************************************//**
+ 755:Generated_Source\PSoC4/RTC.h **** *
+ 756:Generated_Source\PSoC4/RTC.h **** * Returns the month value from the date value that is passed as parameter.
+ 757:Generated_Source\PSoC4/RTC.h **** *
+ 758:Generated_Source\PSoC4/RTC.h **** * \param date
+ 759:Generated_Source\PSoC4/RTC.h **** * The date value.
+ 760:Generated_Source\PSoC4/RTC.h **** *
+ 761:Generated_Source\PSoC4/RTC.h **** * \return
+ 762:Generated_Source\PSoC4/RTC.h **** * The month value.
+ 763:Generated_Source\PSoC4/RTC.h **** *
+ 764:Generated_Source\PSoC4/RTC.h **** *******************************************************************************/
+ 765:Generated_Source\PSoC4/RTC.h **** static CY_INLINE uint32 RTC_GetMonth(uint32 date)
+ 766:Generated_Source\PSoC4/RTC.h **** {
+ 767:Generated_Source\PSoC4/RTC.h ****     uint32 retVal;
+ 768:Generated_Source\PSoC4/RTC.h **** 
+ 769:Generated_Source\PSoC4/RTC.h ****     retVal  = ((date & RTC_10_MONTH_MASK) >> RTC_10_MONTH_OFFSET) * 10u;
+ 345              		.loc 2 769 0
+ 346 00c0 230F     		lsrs	r3, r4, #28
+ 347 00c2 0122     		movs	r2, #1
+ 348 00c4 1340     		ands	r3, r2
+ 349 00c6 9A00     		lsls	r2, r3, #2
+ 350 00c8 D318     		adds	r3, r2, r3
+ 351 00ca 5900     		lsls	r1, r3, #1
+ 352              	.LVL40:
+ 770:Generated_Source\PSoC4/RTC.h ****     retVal += (date & RTC_MONTH_MASK) >> RTC_MONTH_OFFSET;
+ 353              		.loc 2 770 0
+ 354 00cc 220E     		lsrs	r2, r4, #24
+ 355 00ce 3240     		ands	r2, r6
+ 356 00d0 8A18     		adds	r2, r1, r2
+ 357              	.LVL41:
+ 358              	.LBE21:
+ 359              	.LBE20:
+ 360              	.LBB22:
+ 361              	.LBB23:
+ 745:Generated_Source\PSoC4/RTC.h ****     retVal += (date & RTC_DAY_MASK) >> RTC_DAY_OFFSET;
+ 362              		.loc 2 745 0
+ 363 00d2 210D     		lsrs	r1, r4, #20
+ 364 00d4 4346     		mov	r3, r8
+ 365 00d6 1940     		ands	r1, r3
+ 366 00d8 8B00     		lsls	r3, r1, #2
+ 367 00da 5918     		adds	r1, r3, r1
+ 368 00dc 4800     		lsls	r0, r1, #1
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 26
+
+
+ 369              	.LVL42:
+ 746:Generated_Source\PSoC4/RTC.h **** 
+ 370              		.loc 2 746 0
+ 371 00de 230C     		lsrs	r3, r4, #16
+ 372 00e0 3340     		ands	r3, r6
+ 373 00e2 C318     		adds	r3, r0, r3
+ 374              	.LVL43:
+ 375              	.LBE23:
+ 376              	.LBE22:
+ 377              	.LBB24:
+ 378              	.LBB25:
+ 771:Generated_Source\PSoC4/RTC.h **** 
+ 772:Generated_Source\PSoC4/RTC.h ****     return (retVal);
+ 773:Generated_Source\PSoC4/RTC.h **** }
+ 774:Generated_Source\PSoC4/RTC.h **** 
+ 775:Generated_Source\PSoC4/RTC.h **** 
+ 776:Generated_Source\PSoC4/RTC.h **** /*******************************************************************************
+ 777:Generated_Source\PSoC4/RTC.h **** * Function Name: RTC_GetYear
+ 778:Generated_Source\PSoC4/RTC.h **** ****************************************************************************//**
+ 779:Generated_Source\PSoC4/RTC.h **** *
+ 780:Generated_Source\PSoC4/RTC.h **** * Returns the year value from the date value that is passed as parameter.
+ 781:Generated_Source\PSoC4/RTC.h **** *
+ 782:Generated_Source\PSoC4/RTC.h **** * \param date
+ 783:Generated_Source\PSoC4/RTC.h **** * The date value.
+ 784:Generated_Source\PSoC4/RTC.h **** *
+ 785:Generated_Source\PSoC4/RTC.h **** * \return
+ 786:Generated_Source\PSoC4/RTC.h **** * The year value.
+ 787:Generated_Source\PSoC4/RTC.h **** *
+ 788:Generated_Source\PSoC4/RTC.h **** *******************************************************************************/
+ 789:Generated_Source\PSoC4/RTC.h **** static CY_INLINE uint32 RTC_GetYear(uint32 date)
+ 790:Generated_Source\PSoC4/RTC.h **** {
+ 791:Generated_Source\PSoC4/RTC.h ****     uint32 retVal;
+ 792:Generated_Source\PSoC4/RTC.h **** 
+ 793:Generated_Source\PSoC4/RTC.h ****     retVal  = ((date & RTC_1000_YEAR_MASK) >> RTC_1000_YEAR_OFFSET) * 1000u;
+ 379              		.loc 2 793 0
+ 380 00e4 200B     		lsrs	r0, r4, #12
+ 381 00e6 4146     		mov	r1, r8
+ 382 00e8 0840     		ands	r0, r1
+ 383 00ea FA25     		movs	r5, #250
+ 384 00ec AD00     		lsls	r5, r5, #2
+ 385 00ee 2900     		movs	r1, r5
+ 386 00f0 4143     		muls	r1, r0
+ 387              	.LVL44:
+ 794:Generated_Source\PSoC4/RTC.h ****     retVal += ((date & RTC_100_YEAR_MASK) >> RTC_100_YEAR_OFFSET) * 100u;
+ 388              		.loc 2 794 0
+ 389 00f2 200A     		lsrs	r0, r4, #8
+ 390 00f4 3040     		ands	r0, r6
+ 391 00f6 6425     		movs	r5, #100
+ 392 00f8 6843     		muls	r0, r5
+ 393 00fa 4018     		adds	r0, r0, r1
+ 394              	.LVL45:
+ 795:Generated_Source\PSoC4/RTC.h ****     retVal += ((date & RTC_10_YEAR_MASK) >> RTC_10_YEAR_OFFSET) * 10u;
+ 395              		.loc 2 795 0
+ 396 00fc 2109     		lsrs	r1, r4, #4
+ 397 00fe 3140     		ands	r1, r6
+ 398 0100 8D00     		lsls	r5, r1, #2
+ 399 0102 6918     		adds	r1, r5, r1
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 27
+
+
+ 400 0104 4D00     		lsls	r5, r1, #1
+ 401 0106 4019     		adds	r0, r0, r5
+ 402              	.LVL46:
+ 796:Generated_Source\PSoC4/RTC.h ****     retVal += (date & RTC_YEAR_MASK) >> RTC_YEAR_OFFSET;
+ 403              		.loc 2 796 0
+ 404 0108 3440     		ands	r4, r6
+ 405              	.LVL47:
+ 406 010a 0419     		adds	r4, r0, r4
+ 407              	.LVL48:
+ 408              	.LBE25:
+ 409              	.LBE24:
+ 154:main.c        **** 
+ 410              		.loc 1 154 0
+ 411 010c 0094     		str	r4, [sp]
+ 412 010e 1B49     		ldr	r1, .L15+36
+ 413 0110 02A8     		add	r0, sp, #8
+ 414 0112 FFF7FEFF 		bl	sprintf
+ 415              	.LVL49:
+ 156:main.c        ****         UART_PutString(" | ");
+ 416              		.loc 1 156 0
+ 417 0116 06A8     		add	r0, sp, #24
+ 418 0118 FFF7FEFF 		bl	UART_PutString
+ 419              	.LVL50:
+ 157:main.c        ****         UART_PutString(dateBuffer);
+ 420              		.loc 1 157 0
+ 421 011c 184C     		ldr	r4, .L15+40
+ 422 011e 2000     		movs	r0, r4
+ 423 0120 FFF7FEFF 		bl	UART_PutString
+ 424              	.LVL51:
+ 158:main.c        ****         UART_PutString(" | ");
+ 425              		.loc 1 158 0
+ 426 0124 02A8     		add	r0, sp, #8
+ 427 0126 FFF7FEFF 		bl	UART_PutString
+ 428              	.LVL52:
+ 159:main.c        **** 
+ 429              		.loc 1 159 0
+ 430 012a 2000     		movs	r0, r4
+ 431 012c FFF7FEFF 		bl	UART_PutString
+ 432              	.LVL53:
+ 161:main.c        ****         {
+ 433              		.loc 1 161 0
+ 434 0130 7B68     		ldr	r3, [r7, #4]
+ 435 0132 012B     		cmp	r3, #1
+ 436 0134 06D1     		bne	.L12
+ 163:main.c        ****             alarmFlag  = 0u;
+ 437              		.loc 1 163 0
+ 438 0136 1348     		ldr	r0, .L15+44
+ 439 0138 FFF7FEFF 		bl	UART_PutString
+ 440              	.LVL54:
+ 164:main.c        ****         }
+ 441              		.loc 1 164 0
+ 442 013c 0022     		movs	r2, #0
+ 443 013e 0D4B     		ldr	r3, .L15+28
+ 444 0140 5A60     		str	r2, [r3, #4]
+ 445 0142 02E0     		b	.L13
+ 446              	.L12:
+ 168:main.c        ****         }
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 28
+
+
+ 447              		.loc 1 168 0
+ 448 0144 1048     		ldr	r0, .L15+48
+ 449 0146 FFF7FEFF 		bl	UART_PutString
+ 450              	.LVL55:
+ 451              	.L13:
+ 171:main.c        **** 
+ 452              		.loc 1 171 0
+ 453 014a 1048     		ldr	r0, .L15+52
+ 454 014c FFF7FEFF 		bl	UART_PutString
+ 455              	.LVL56:
+ 174:main.c        ****     }
+ 456              		.loc 1 174 0
+ 457 0150 FFF7FEFF 		bl	CySysPmDeepSleep
+ 458              	.LVL57:
+ 175:main.c        **** }
+ 459              		.loc 1 175 0
+ 460 0154 8BE7     		b	.L14
+ 461              	.L16:
+ 462 0156 C046     		.align	2
+ 463              	.L15:
+ 464 0158 00000000 		.word	alarmTimeDate
+ 465 015c 30010400 		.word	262448
+ 466 0160 20201008 		.word	135274528
+ 467 0164 00000000 		.word	EnableRtcOperation
+ 468 0168 CC0C0000 		.word	3276
+ 469 016c 00481300 		.word	1263616
+ 470 0170 00000000 		.word	AlarmIsrHandler
+ 471 0174 00000000 		.word	.LANCHOR0
+ 472 0178 00000000 		.word	.LC6
+ 473 017c 18000000 		.word	.LC9
+ 474 0180 2C000000 		.word	.LC11
+ 475 0184 30000000 		.word	.LC13
+ 476 0188 3C000000 		.word	.LC15
+ 477 018c 48000000 		.word	.LC17
+ 478              		.cfi_endproc
+ 479              	.LFE63:
+ 480              		.size	main, .-main
+ 481              		.global	ui100mS
+ 482              		.global	alarmFlag
+ 483              		.comm	alarmTimeDate,16,4
+ 484              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 485              		.align	2
+ 486              	.LC6:
+ 487 0000 2530326C 		.ascii	"%02lu:%02lu:%02lu.%1lu\000"
+ 487      753A2530 
+ 487      326C753A 
+ 487      2530326C 
+ 487      752E2531 
+ 488 0017 00       		.space	1
+ 489              	.LC9:
+ 490 0018 2530326C 		.ascii	"%02lu/%02lu/%02lu\000"
+ 490      752F2530 
+ 490      326C752F 
+ 490      2530326C 
+ 490      7500
+ 491 002a 0000     		.space	2
+ 492              	.LC11:
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 29
+
+
+ 493 002c 207C2000 		.ascii	" | \000"
+ 494              	.LC13:
+ 495 0030 2020416C 		.ascii	"  Alarm \000"
+ 495      61726D20 
+ 495      00
+ 496 0039 000000   		.space	3
+ 497              	.LC15:
+ 498 003c 4E6F2061 		.ascii	"No alarm\000"
+ 498      6C61726D 
+ 498      00
+ 499 0045 000000   		.space	3
+ 500              	.LC17:
+ 501 0048 0D00     		.ascii	"\015\000"
+ 502              		.bss
+ 503              		.align	2
+ 504              		.set	.LANCHOR0,. + 0
+ 505              		.type	ui100mS, %object
+ 506              		.size	ui100mS, 4
+ 507              	ui100mS:
+ 508 0000 00000000 		.space	4
+ 509              		.type	alarmFlag, %object
+ 510              		.size	alarmFlag, 4
+ 511              	alarmFlag:
+ 512 0004 00000000 		.space	4
+ 513              		.text
+ 514              	.Letext0:
+ 515              		.file 3 "Generated_Source\\PSoC4/cytypes.h"
+ 516              		.file 4 "Generated_Source\\PSoC4/CyLFClk.h"
+ 517              		.file 5 "Generated_Source\\PSoC4/LFCLK_Out.h"
+ 518              		.file 6 "Generated_Source\\PSoC4/LED_WdtIsr.h"
+ 519              		.file 7 "Generated_Source\\PSoC4/LED_Alarm.h"
+ 520              		.file 8 "c:\\program files (x86)\\cypress\\psoc creator\\4.3\\psoc creator\\import\\gnu\\arm\\5.4.
+ 521              		.file 9 "Generated_Source\\PSoC4/UART.h"
+ 522              		.file 10 "Generated_Source\\PSoC4/cyPm.h"
+ 523              		.section	.debug_info,"",%progbits
+ 524              	.Ldebug_info0:
+ 525 0000 60080000 		.4byte	0x860
+ 526 0004 0400     		.2byte	0x4
+ 527 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 528 000a 04       		.byte	0x4
+ 529 000b 01       		.uleb128 0x1
+ 530 000c 14010000 		.4byte	.LASF70
+ 531 0010 0C       		.byte	0xc
+ 532 0011 CF030000 		.4byte	.LASF71
+ 533 0015 5F000000 		.4byte	.LASF72
+ 534 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 535 001d 00000000 		.4byte	0
+ 536 0021 00000000 		.4byte	.Ldebug_line0
+ 537 0025 02       		.uleb128 0x2
+ 538 0026 01       		.byte	0x1
+ 539 0027 06       		.byte	0x6
+ 540 0028 C2020000 		.4byte	.LASF0
+ 541 002c 02       		.uleb128 0x2
+ 542 002d 01       		.byte	0x1
+ 543 002e 08       		.byte	0x8
+ 544 002f 89020000 		.4byte	.LASF1
+ 545 0033 02       		.uleb128 0x2
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 30
+
+
+ 546 0034 02       		.byte	0x2
+ 547 0035 05       		.byte	0x5
+ 548 0036 55000000 		.4byte	.LASF2
+ 549 003a 02       		.uleb128 0x2
+ 550 003b 02       		.byte	0x2
+ 551 003c 07       		.byte	0x7
+ 552 003d 55030000 		.4byte	.LASF3
+ 553 0041 02       		.uleb128 0x2
+ 554 0042 04       		.byte	0x4
+ 555 0043 05       		.byte	0x5
+ 556 0044 0C020000 		.4byte	.LASF4
+ 557 0048 02       		.uleb128 0x2
+ 558 0049 04       		.byte	0x4
+ 559 004a 07       		.byte	0x7
+ 560 004b D6030000 		.4byte	.LASF5
+ 561 004f 02       		.uleb128 0x2
+ 562 0050 08       		.byte	0x8
+ 563 0051 05       		.byte	0x5
+ 564 0052 EE010000 		.4byte	.LASF6
+ 565 0056 02       		.uleb128 0x2
+ 566 0057 08       		.byte	0x8
+ 567 0058 07       		.byte	0x7
+ 568 0059 E5020000 		.4byte	.LASF7
+ 569 005d 03       		.uleb128 0x3
+ 570 005e 04       		.byte	0x4
+ 571 005f 05       		.byte	0x5
+ 572 0060 696E7400 		.ascii	"int\000"
+ 573 0064 02       		.uleb128 0x2
+ 574 0065 04       		.byte	0x4
+ 575 0066 07       		.byte	0x7
+ 576 0067 0D030000 		.4byte	.LASF8
+ 577 006b 04       		.uleb128 0x4
+ 578 006c AC010000 		.4byte	.LASF9
+ 579 0070 03       		.byte	0x3
+ 580 0071 F701     		.2byte	0x1f7
+ 581 0073 2C000000 		.4byte	0x2c
+ 582 0077 04       		.uleb128 0x4
+ 583 0078 B8030000 		.4byte	.LASF10
+ 584 007c 03       		.byte	0x3
+ 585 007d F801     		.2byte	0x1f8
+ 586 007f 3A000000 		.4byte	0x3a
+ 587 0083 04       		.uleb128 0x4
+ 588 0084 F4030000 		.4byte	.LASF11
+ 589 0088 03       		.byte	0x3
+ 590 0089 F901     		.2byte	0x1f9
+ 591 008b 48000000 		.4byte	0x48
+ 592 008f 02       		.uleb128 0x2
+ 593 0090 04       		.byte	0x4
+ 594 0091 04       		.byte	0x4
+ 595 0092 DA010000 		.4byte	.LASF12
+ 596 0096 02       		.uleb128 0x2
+ 597 0097 08       		.byte	0x8
+ 598 0098 04       		.byte	0x4
+ 599 0099 80040000 		.4byte	.LASF13
+ 600 009d 02       		.uleb128 0x2
+ 601 009e 01       		.byte	0x1
+ 602 009f 08       		.byte	0x8
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 31
+
+
+ 603 00a0 6F030000 		.4byte	.LASF14
+ 604 00a4 05       		.uleb128 0x5
+ 605 00a5 01       		.byte	0x1
+ 606 00a6 2C000000 		.4byte	0x2c
+ 607 00aa 04       		.byte	0x4
+ 608 00ab 1A       		.byte	0x1a
+ 609 00ac BD000000 		.4byte	0xbd
+ 610 00b0 06       		.uleb128 0x6
+ 611 00b1 C2040000 		.4byte	.LASF15
+ 612 00b5 00       		.byte	0
+ 613 00b6 06       		.uleb128 0x6
+ 614 00b7 30000000 		.4byte	.LASF16
+ 615 00bb 01       		.byte	0x1
+ 616 00bc 00       		.byte	0
+ 617 00bd 02       		.uleb128 0x2
+ 618 00be 08       		.byte	0x8
+ 619 00bf 04       		.byte	0x4
+ 620 00c0 70020000 		.4byte	.LASF17
+ 621 00c4 02       		.uleb128 0x2
+ 622 00c5 04       		.byte	0x4
+ 623 00c6 07       		.byte	0x7
+ 624 00c7 A5000000 		.4byte	.LASF18
+ 625 00cb 07       		.uleb128 0x7
+ 626 00cc 10       		.byte	0x10
+ 627 00cd 02       		.byte	0x2
+ 628 00ce 2E       		.byte	0x2e
+ 629 00cf 04010000 		.4byte	0x104
+ 630 00d3 08       		.uleb128 0x8
+ 631 00d4 50030000 		.4byte	.LASF19
+ 632 00d8 02       		.byte	0x2
+ 633 00d9 30       		.byte	0x30
+ 634 00da 83000000 		.4byte	0x83
+ 635 00de 00       		.byte	0
+ 636 00df 08       		.uleb128 0x8
+ 637 00e0 BF030000 		.4byte	.LASF20
+ 638 00e4 02       		.byte	0x2
+ 639 00e5 31       		.byte	0x31
+ 640 00e6 83000000 		.4byte	0x83
+ 641 00ea 04       		.byte	0x4
+ 642 00eb 08       		.uleb128 0x8
+ 643 00ec DE000000 		.4byte	.LASF21
+ 644 00f0 02       		.byte	0x2
+ 645 00f1 32       		.byte	0x32
+ 646 00f2 83000000 		.4byte	0x83
+ 647 00f6 08       		.byte	0x8
+ 648 00f7 08       		.uleb128 0x8
+ 649 00f8 68030000 		.4byte	.LASF22
+ 650 00fc 02       		.byte	0x2
+ 651 00fd 33       		.byte	0x33
+ 652 00fe 83000000 		.4byte	0x83
+ 653 0102 0C       		.byte	0xc
+ 654 0103 00       		.byte	0
+ 655 0104 09       		.uleb128 0x9
+ 656 0105 45020000 		.4byte	.LASF23
+ 657 0109 02       		.byte	0x2
+ 658 010a 34       		.byte	0x34
+ 659 010b CB000000 		.4byte	0xcb
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 32
+
+
+ 660 010f 0A       		.uleb128 0xa
+ 661 0110 E8030000 		.4byte	.LASF24
+ 662 0114 02       		.byte	0x2
+ 663 0115 1503     		.2byte	0x315
+ 664 0117 83000000 		.4byte	0x83
+ 665 011b 03       		.byte	0x3
+ 666 011c 39010000 		.4byte	0x139
+ 667 0120 0B       		.uleb128 0xb
+ 668 0121 BF030000 		.4byte	.LASF20
+ 669 0125 02       		.byte	0x2
+ 670 0126 1503     		.2byte	0x315
+ 671 0128 83000000 		.4byte	0x83
+ 672 012c 0C       		.uleb128 0xc
+ 673 012d 79040000 		.4byte	.LASF26
+ 674 0131 02       		.byte	0x2
+ 675 0132 1703     		.2byte	0x317
+ 676 0134 83000000 		.4byte	0x83
+ 677 0138 00       		.byte	0
+ 678 0139 0A       		.uleb128 0xa
+ 679 013a C4030000 		.4byte	.LASF25
+ 680 013e 02       		.byte	0x2
+ 681 013f E502     		.2byte	0x2e5
+ 682 0141 83000000 		.4byte	0x83
+ 683 0145 03       		.byte	0x3
+ 684 0146 63010000 		.4byte	0x163
+ 685 014a 0B       		.uleb128 0xb
+ 686 014b BF030000 		.4byte	.LASF20
+ 687 014f 02       		.byte	0x2
+ 688 0150 E502     		.2byte	0x2e5
+ 689 0152 83000000 		.4byte	0x83
+ 690 0156 0C       		.uleb128 0xc
+ 691 0157 79040000 		.4byte	.LASF26
+ 692 015b 02       		.byte	0x2
+ 693 015c E702     		.2byte	0x2e7
+ 694 015e 83000000 		.4byte	0x83
+ 695 0162 00       		.byte	0
+ 696 0163 0A       		.uleb128 0xa
+ 697 0164 AE000000 		.4byte	.LASF27
+ 698 0168 02       		.byte	0x2
+ 699 0169 FD02     		.2byte	0x2fd
+ 700 016b 83000000 		.4byte	0x83
+ 701 016f 03       		.byte	0x3
+ 702 0170 8D010000 		.4byte	0x18d
+ 703 0174 0B       		.uleb128 0xb
+ 704 0175 BF030000 		.4byte	.LASF20
+ 705 0179 02       		.byte	0x2
+ 706 017a FD02     		.2byte	0x2fd
+ 707 017c 83000000 		.4byte	0x83
+ 708 0180 0C       		.uleb128 0xc
+ 709 0181 79040000 		.4byte	.LASF26
+ 710 0185 02       		.byte	0x2
+ 711 0186 FF02     		.2byte	0x2ff
+ 712 0188 83000000 		.4byte	0x83
+ 713 018c 00       		.byte	0
+ 714 018d 0A       		.uleb128 0xa
+ 715 018e F7000000 		.4byte	.LASF28
+ 716 0192 02       		.byte	0x2
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 33
+
+
+ 717 0193 8902     		.2byte	0x289
+ 718 0195 83000000 		.4byte	0x83
+ 719 0199 03       		.byte	0x3
+ 720 019a B7010000 		.4byte	0x1b7
+ 721 019e 0B       		.uleb128 0xb
+ 722 019f 66020000 		.4byte	.LASF29
+ 723 01a3 02       		.byte	0x2
+ 724 01a4 8902     		.2byte	0x289
+ 725 01a6 83000000 		.4byte	0x83
+ 726 01aa 0C       		.uleb128 0xc
+ 727 01ab 79040000 		.4byte	.LASF26
+ 728 01af 02       		.byte	0x2
+ 729 01b0 8B02     		.2byte	0x28b
+ 730 01b2 83000000 		.4byte	0x83
+ 731 01b6 00       		.byte	0
+ 732 01b7 0A       		.uleb128 0xa
+ 733 01b8 8A030000 		.4byte	.LASF30
+ 734 01bc 02       		.byte	0x2
+ 735 01bd A202     		.2byte	0x2a2
+ 736 01bf 83000000 		.4byte	0x83
+ 737 01c3 03       		.byte	0x3
+ 738 01c4 E1010000 		.4byte	0x1e1
+ 739 01c8 0B       		.uleb128 0xb
+ 740 01c9 66020000 		.4byte	.LASF29
+ 741 01cd 02       		.byte	0x2
+ 742 01ce A202     		.2byte	0x2a2
+ 743 01d0 83000000 		.4byte	0x83
+ 744 01d4 0C       		.uleb128 0xc
+ 745 01d5 79040000 		.4byte	.LASF26
+ 746 01d9 02       		.byte	0x2
+ 747 01da A402     		.2byte	0x2a4
+ 748 01dc 83000000 		.4byte	0x83
+ 749 01e0 00       		.byte	0
+ 750 01e1 0A       		.uleb128 0xa
+ 751 01e2 7C020000 		.4byte	.LASF31
+ 752 01e6 02       		.byte	0x2
+ 753 01e7 BA02     		.2byte	0x2ba
+ 754 01e9 83000000 		.4byte	0x83
+ 755 01ed 03       		.byte	0x3
+ 756 01ee 0B020000 		.4byte	0x20b
+ 757 01f2 0B       		.uleb128 0xb
+ 758 01f3 66020000 		.4byte	.LASF29
+ 759 01f7 02       		.byte	0x2
+ 760 01f8 BA02     		.2byte	0x2ba
+ 761 01fa 83000000 		.4byte	0x83
+ 762 01fe 0C       		.uleb128 0xc
+ 763 01ff 79040000 		.4byte	.LASF26
+ 764 0203 02       		.byte	0x2
+ 765 0204 BC02     		.2byte	0x2bc
+ 766 0206 83000000 		.4byte	0x83
+ 767 020a 00       		.byte	0
+ 768 020b 0D       		.uleb128 0xd
+ 769 020c 2F040000 		.4byte	.LASF32
+ 770 0210 01       		.byte	0x1
+ 771 0211 C1       		.byte	0xc1
+ 772 0212 00000000 		.4byte	.LFB64
+ 773 0216 44000000 		.4byte	.LFE64-.LFB64
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 34
+
+
+ 774 021a 01       		.uleb128 0x1
+ 775 021b 9C       		.byte	0x9c
+ 776 021c CC020000 		.4byte	0x2cc
+ 777 0220 0E       		.uleb128 0xe
+ 778 0221 0A000000 		.4byte	.LVL0
+ 779 0225 1A070000 		.4byte	0x71a
+ 780 0229 35020000 		.4byte	0x235
+ 781 022d 0F       		.uleb128 0xf
+ 782 022e 01       		.uleb128 0x1
+ 783 022f 50       		.byte	0x50
+ 784 0230 03       		.uleb128 0x3
+ 785 0231 40       		.byte	0x40
+ 786 0232 4A       		.byte	0x4a
+ 787 0233 24       		.byte	0x24
+ 788 0234 00       		.byte	0
+ 789 0235 0E       		.uleb128 0xe
+ 790 0236 10000000 		.4byte	.LVL1
+ 791 023a 25070000 		.4byte	0x725
+ 792 023e 48020000 		.4byte	0x248
+ 793 0242 0F       		.uleb128 0xf
+ 794 0243 01       		.uleb128 0x1
+ 795 0244 50       		.byte	0x50
+ 796 0245 01       		.uleb128 0x1
+ 797 0246 31       		.byte	0x31
+ 798 0247 00       		.byte	0
+ 799 0248 0E       		.uleb128 0xe
+ 800 0249 18000000 		.4byte	.LVL2
+ 801 024d 30070000 		.4byte	0x730
+ 802 0251 60020000 		.4byte	0x260
+ 803 0255 0F       		.uleb128 0xf
+ 804 0256 01       		.uleb128 0x1
+ 805 0257 50       		.byte	0x50
+ 806 0258 01       		.uleb128 0x1
+ 807 0259 30       		.byte	0x30
+ 808 025a 0F       		.uleb128 0xf
+ 809 025b 01       		.uleb128 0x1
+ 810 025c 51       		.byte	0x51
+ 811 025d 01       		.uleb128 0x1
+ 812 025e 31       		.byte	0x31
+ 813 025f 00       		.byte	0
+ 814 0260 0E       		.uleb128 0xe
+ 815 0261 20000000 		.4byte	.LVL3
+ 816 0265 3B070000 		.4byte	0x73b
+ 817 0269 7A020000 		.4byte	0x27a
+ 818 026d 0F       		.uleb128 0xf
+ 819 026e 01       		.uleb128 0x1
+ 820 026f 50       		.byte	0x50
+ 821 0270 01       		.uleb128 0x1
+ 822 0271 30       		.byte	0x30
+ 823 0272 0F       		.uleb128 0xf
+ 824 0273 01       		.uleb128 0x1
+ 825 0274 51       		.byte	0x51
+ 826 0275 03       		.uleb128 0x3
+ 827 0276 0A       		.byte	0xa
+ 828 0277 CC0C     		.2byte	0xccc
+ 829 0279 00       		.byte	0
+ 830 027a 0E       		.uleb128 0xe
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 35
+
+
+ 831 027b 26000000 		.4byte	.LVL4
+ 832 027f 46070000 		.4byte	0x746
+ 833 0283 8D020000 		.4byte	0x28d
+ 834 0287 0F       		.uleb128 0xf
+ 835 0288 01       		.uleb128 0x1
+ 836 0289 50       		.byte	0x50
+ 837 028a 01       		.uleb128 0x1
+ 838 028b 31       		.byte	0x31
+ 839 028c 00       		.byte	0
+ 840 028d 0E       		.uleb128 0xe
+ 841 028e 2E000000 		.4byte	.LVL5
+ 842 0292 51070000 		.4byte	0x751
+ 843 0296 A9020000 		.4byte	0x2a9
+ 844 029a 0F       		.uleb128 0xf
+ 845 029b 01       		.uleb128 0x1
+ 846 029c 50       		.byte	0x50
+ 847 029d 01       		.uleb128 0x1
+ 848 029e 30       		.byte	0x30
+ 849 029f 0F       		.uleb128 0xf
+ 850 02a0 01       		.uleb128 0x1
+ 851 02a1 51       		.byte	0x51
+ 852 02a2 05       		.uleb128 0x5
+ 853 02a3 03       		.byte	0x3
+ 854 02a4 00000000 		.4byte	UpdateTimeIsrHandler
+ 855 02a8 00       		.byte	0
+ 856 02a9 0E       		.uleb128 0xe
+ 857 02aa 34000000 		.4byte	.LVL6
+ 858 02ae 5C070000 		.4byte	0x75c
+ 859 02b2 BC020000 		.4byte	0x2bc
+ 860 02b6 0F       		.uleb128 0xf
+ 861 02b7 01       		.uleb128 0x1
+ 862 02b8 50       		.byte	0x50
+ 863 02b9 01       		.uleb128 0x1
+ 864 02ba 30       		.byte	0x30
+ 865 02bb 00       		.byte	0
+ 866 02bc 10       		.uleb128 0x10
+ 867 02bd 3A000000 		.4byte	.LVL7
+ 868 02c1 67070000 		.4byte	0x767
+ 869 02c5 0F       		.uleb128 0xf
+ 870 02c6 01       		.uleb128 0x1
+ 871 02c7 50       		.byte	0x50
+ 872 02c8 01       		.uleb128 0x1
+ 873 02c9 36       		.byte	0x36
+ 874 02ca 00       		.byte	0
+ 875 02cb 00       		.byte	0
+ 876 02cc 0D       		.uleb128 0xd
+ 877 02cd 87040000 		.4byte	.LASF33
+ 878 02d1 01       		.byte	0x1
+ 879 02d2 E5       		.byte	0xe5
+ 880 02d3 00000000 		.4byte	.LFB65
+ 881 02d7 2C000000 		.4byte	.LFE65-.LFB65
+ 882 02db 01       		.uleb128 0x1
+ 883 02dc 9C       		.byte	0x9c
+ 884 02dd FD020000 		.4byte	0x2fd
+ 885 02e1 11       		.uleb128 0x11
+ 886 02e2 18000000 		.4byte	.LVL8
+ 887 02e6 72070000 		.4byte	0x772
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 36
+
+
+ 888 02ea 11       		.uleb128 0x11
+ 889 02eb 20000000 		.4byte	.LVL9
+ 890 02ef 7D070000 		.4byte	0x77d
+ 891 02f3 11       		.uleb128 0x11
+ 892 02f4 24000000 		.4byte	.LVL10
+ 893 02f8 88070000 		.4byte	0x788
+ 894 02fc 00       		.byte	0
+ 895 02fd 0D       		.uleb128 0xd
+ 896 02fe 1F040000 		.4byte	.LASF34
+ 897 0302 01       		.byte	0x1
+ 898 0303 FD       		.byte	0xfd
+ 899 0304 00000000 		.4byte	.LFB66
+ 900 0308 20000000 		.4byte	.LFE66-.LFB66
+ 901 030c 01       		.uleb128 0x1
+ 902 030d 9C       		.byte	0x9c
+ 903 030e 2E030000 		.4byte	0x32e
+ 904 0312 11       		.uleb128 0x11
+ 905 0313 0C000000 		.4byte	.LVL11
+ 906 0317 94070000 		.4byte	0x794
+ 907 031b 11       		.uleb128 0x11
+ 908 031c 14000000 		.4byte	.LVL12
+ 909 0320 9F070000 		.4byte	0x79f
+ 910 0324 11       		.uleb128 0x11
+ 911 0325 18000000 		.4byte	.LVL13
+ 912 0329 AA070000 		.4byte	0x7aa
+ 913 032d 00       		.byte	0
+ 914 032e 12       		.uleb128 0x12
+ 915 032f 74030000 		.4byte	.LASF73
+ 916 0333 01       		.byte	0x1
+ 917 0334 58       		.byte	0x58
+ 918 0335 5D000000 		.4byte	0x5d
+ 919 0339 00000000 		.4byte	.LFB63
+ 920 033d 90010000 		.4byte	.LFE63-.LFB63
+ 921 0341 01       		.uleb128 0x1
+ 922 0342 9C       		.byte	0x9c
+ 923 0343 B1060000 		.4byte	0x6b1
+ 924 0347 13       		.uleb128 0x13
+ 925 0348 B7040000 		.4byte	.LASF35
+ 926 034c 01       		.byte	0x1
+ 927 034d 5A       		.byte	0x5a
+ 928 034e B1060000 		.4byte	0x6b1
+ 929 0352 02       		.uleb128 0x2
+ 930 0353 91       		.byte	0x91
+ 931 0354 58       		.sleb128 -40
+ 932 0355 13       		.uleb128 0x13
+ 933 0356 99030000 		.4byte	.LASF36
+ 934 035a 01       		.byte	0x1
+ 935 035b 5B       		.byte	0x5b
+ 936 035c B1060000 		.4byte	0x6b1
+ 937 0360 02       		.uleb128 0x2
+ 938 0361 91       		.byte	0x91
+ 939 0362 48       		.sleb128 -56
+ 940 0363 14       		.uleb128 0x14
+ 941 0364 50030000 		.4byte	.LASF19
+ 942 0368 01       		.byte	0x1
+ 943 0369 5D       		.byte	0x5d
+ 944 036a 83000000 		.4byte	0x83
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 37
+
+
+ 945 036e 00000000 		.4byte	.LLST0
+ 946 0372 14       		.uleb128 0x14
+ 947 0373 BF030000 		.4byte	.LASF20
+ 948 0377 01       		.byte	0x1
+ 949 0378 5E       		.byte	0x5e
+ 950 0379 83000000 		.4byte	0x83
+ 951 037d 1E000000 		.4byte	.LLST1
+ 952 0381 15       		.uleb128 0x15
+ 953 0382 E1010000 		.4byte	0x1e1
+ 954 0386 7A000000 		.4byte	.LBB14
+ 955 038a 16000000 		.4byte	.LBE14-.LBB14
+ 956 038e 01       		.byte	0x1
+ 957 038f 99       		.byte	0x99
+ 958 0390 B1030000 		.4byte	0x3b1
+ 959 0394 16       		.uleb128 0x16
+ 960 0395 F2010000 		.4byte	0x1f2
+ 961 0399 3C000000 		.4byte	.LLST2
+ 962 039d 17       		.uleb128 0x17
+ 963 039e 7A000000 		.4byte	.LBB15
+ 964 03a2 16000000 		.4byte	.LBE15-.LBB15
+ 965 03a6 18       		.uleb128 0x18
+ 966 03a7 FE010000 		.4byte	0x1fe
+ 967 03ab 4F000000 		.4byte	.LLST3
+ 968 03af 00       		.byte	0
+ 969 03b0 00       		.byte	0
+ 970 03b1 15       		.uleb128 0x15
+ 971 03b2 B7010000 		.4byte	0x1b7
+ 972 03b6 90000000 		.4byte	.LBB16
+ 973 03ba 12000000 		.4byte	.LBE16-.LBB16
+ 974 03be 01       		.byte	0x1
+ 975 03bf 99       		.byte	0x99
+ 976 03c0 E1030000 		.4byte	0x3e1
+ 977 03c4 16       		.uleb128 0x16
+ 978 03c5 C8010000 		.4byte	0x1c8
+ 979 03c9 62000000 		.4byte	.LLST4
+ 980 03cd 17       		.uleb128 0x17
+ 981 03ce 90000000 		.4byte	.LBB17
+ 982 03d2 12000000 		.4byte	.LBE17-.LBB17
+ 983 03d6 18       		.uleb128 0x18
+ 984 03d7 D4010000 		.4byte	0x1d4
+ 985 03db 75000000 		.4byte	.LLST5
+ 986 03df 00       		.byte	0
+ 987 03e0 00       		.byte	0
+ 988 03e1 15       		.uleb128 0x15
+ 989 03e2 8D010000 		.4byte	0x18d
+ 990 03e6 A2000000 		.4byte	.LBB18
+ 991 03ea 0E000000 		.4byte	.LBE18-.LBB18
+ 992 03ee 01       		.byte	0x1
+ 993 03ef 99       		.byte	0x99
+ 994 03f0 11040000 		.4byte	0x411
+ 995 03f4 16       		.uleb128 0x16
+ 996 03f5 9E010000 		.4byte	0x19e
+ 997 03f9 88000000 		.4byte	.LLST6
+ 998 03fd 17       		.uleb128 0x17
+ 999 03fe A2000000 		.4byte	.LBB19
+ 1000 0402 0E000000 		.4byte	.LBE19-.LBB19
+ 1001 0406 18       		.uleb128 0x18
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 38
+
+
+ 1002 0407 AA010000 		.4byte	0x1aa
+ 1003 040b 9B000000 		.4byte	.LLST7
+ 1004 040f 00       		.byte	0
+ 1005 0410 00       		.byte	0
+ 1006 0411 15       		.uleb128 0x15
+ 1007 0412 63010000 		.4byte	0x163
+ 1008 0416 C0000000 		.4byte	.LBB20
+ 1009 041a 12000000 		.4byte	.LBE20-.LBB20
+ 1010 041e 01       		.byte	0x1
+ 1011 041f 9A       		.byte	0x9a
+ 1012 0420 41040000 		.4byte	0x441
+ 1013 0424 16       		.uleb128 0x16
+ 1014 0425 74010000 		.4byte	0x174
+ 1015 0429 AE000000 		.4byte	.LLST8
+ 1016 042d 17       		.uleb128 0x17
+ 1017 042e C0000000 		.4byte	.LBB21
+ 1018 0432 12000000 		.4byte	.LBE21-.LBB21
+ 1019 0436 18       		.uleb128 0x18
+ 1020 0437 80010000 		.4byte	0x180
+ 1021 043b C1000000 		.4byte	.LLST9
+ 1022 043f 00       		.byte	0
+ 1023 0440 00       		.byte	0
+ 1024 0441 15       		.uleb128 0x15
+ 1025 0442 39010000 		.4byte	0x139
+ 1026 0446 D2000000 		.4byte	.LBB22
+ 1027 044a 12000000 		.4byte	.LBE22-.LBB22
+ 1028 044e 01       		.byte	0x1
+ 1029 044f 9A       		.byte	0x9a
+ 1030 0450 71040000 		.4byte	0x471
+ 1031 0454 16       		.uleb128 0x16
+ 1032 0455 4A010000 		.4byte	0x14a
+ 1033 0459 D4000000 		.4byte	.LLST10
+ 1034 045d 17       		.uleb128 0x17
+ 1035 045e D2000000 		.4byte	.LBB23
+ 1036 0462 12000000 		.4byte	.LBE23-.LBB23
+ 1037 0466 18       		.uleb128 0x18
+ 1038 0467 56010000 		.4byte	0x156
+ 1039 046b E7000000 		.4byte	.LLST11
+ 1040 046f 00       		.byte	0
+ 1041 0470 00       		.byte	0
+ 1042 0471 15       		.uleb128 0x15
+ 1043 0472 0F010000 		.4byte	0x10f
+ 1044 0476 E4000000 		.4byte	.LBB24
+ 1045 047a 28000000 		.4byte	.LBE24-.LBB24
+ 1046 047e 01       		.byte	0x1
+ 1047 047f 9A       		.byte	0x9a
+ 1048 0480 A1040000 		.4byte	0x4a1
+ 1049 0484 16       		.uleb128 0x16
+ 1050 0485 20010000 		.4byte	0x120
+ 1051 0489 FA000000 		.4byte	.LLST12
+ 1052 048d 17       		.uleb128 0x17
+ 1053 048e E4000000 		.4byte	.LBB25
+ 1054 0492 28000000 		.4byte	.LBE25-.LBB25
+ 1055 0496 18       		.uleb128 0x18
+ 1056 0497 2C010000 		.4byte	0x12c
+ 1057 049b 0D010000 		.4byte	.LLST13
+ 1058 049f 00       		.byte	0
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 39
+
+
+ 1059 04a0 00       		.byte	0
+ 1060 04a1 11       		.uleb128 0x11
+ 1061 04a2 0C000000 		.4byte	.LVL14
+ 1062 04a6 B6070000 		.4byte	0x7b6
+ 1063 04aa 0E       		.uleb128 0xe
+ 1064 04ab 20000000 		.4byte	.LVL15
+ 1065 04af 30070000 		.4byte	0x730
+ 1066 04b3 C2040000 		.4byte	0x4c2
+ 1067 04b7 0F       		.uleb128 0xf
+ 1068 04b8 01       		.uleb128 0x1
+ 1069 04b9 50       		.byte	0x50
+ 1070 04ba 01       		.uleb128 0x1
+ 1071 04bb 30       		.byte	0x30
+ 1072 04bc 0F       		.uleb128 0xf
+ 1073 04bd 01       		.uleb128 0x1
+ 1074 04be 51       		.byte	0x51
+ 1075 04bf 01       		.uleb128 0x1
+ 1076 04c0 30       		.byte	0x30
+ 1077 04c1 00       		.byte	0
+ 1078 04c2 0E       		.uleb128 0xe
+ 1079 04c3 28000000 		.4byte	.LVL16
+ 1080 04c7 C1070000 		.4byte	0x7c1
+ 1081 04cb DA040000 		.4byte	0x4da
+ 1082 04cf 0F       		.uleb128 0xf
+ 1083 04d0 01       		.uleb128 0x1
+ 1084 04d1 50       		.byte	0x50
+ 1085 04d2 01       		.uleb128 0x1
+ 1086 04d3 30       		.byte	0x30
+ 1087 04d4 0F       		.uleb128 0xf
+ 1088 04d5 01       		.uleb128 0x1
+ 1089 04d6 51       		.byte	0x51
+ 1090 04d7 01       		.uleb128 0x1
+ 1091 04d8 31       		.byte	0x31
+ 1092 04d9 00       		.byte	0
+ 1093 04da 0E       		.uleb128 0xe
+ 1094 04db 2E000000 		.4byte	.LVL17
+ 1095 04df 46070000 		.4byte	0x746
+ 1096 04e3 ED040000 		.4byte	0x4ed
+ 1097 04e7 0F       		.uleb128 0xf
+ 1098 04e8 01       		.uleb128 0x1
+ 1099 04e9 50       		.byte	0x50
+ 1100 04ea 01       		.uleb128 0x1
+ 1101 04eb 31       		.byte	0x31
+ 1102 04ec 00       		.byte	0
+ 1103 04ed 0E       		.uleb128 0xe
+ 1104 04ee 34000000 		.4byte	.LVL18
+ 1105 04f2 CC070000 		.4byte	0x7cc
+ 1106 04f6 00050000 		.4byte	0x500
+ 1107 04fa 0F       		.uleb128 0xf
+ 1108 04fb 01       		.uleb128 0x1
+ 1109 04fc 50       		.byte	0x50
+ 1110 04fd 01       		.uleb128 0x1
+ 1111 04fe 30       		.byte	0x30
+ 1112 04ff 00       		.byte	0
+ 1113 0500 0E       		.uleb128 0xe
+ 1114 0501 3C000000 		.4byte	.LVL19
+ 1115 0505 51070000 		.4byte	0x751
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 40
+
+
+ 1116 0509 1C050000 		.4byte	0x51c
+ 1117 050d 0F       		.uleb128 0xf
+ 1118 050e 01       		.uleb128 0x1
+ 1119 050f 50       		.byte	0x50
+ 1120 0510 01       		.uleb128 0x1
+ 1121 0511 30       		.byte	0x30
+ 1122 0512 0F       		.uleb128 0xf
+ 1123 0513 01       		.uleb128 0x1
+ 1124 0514 51       		.byte	0x51
+ 1125 0515 05       		.uleb128 0x5
+ 1126 0516 03       		.byte	0x3
+ 1127 0517 00000000 		.4byte	EnableRtcOperation
+ 1128 051b 00       		.byte	0
+ 1129 051c 0E       		.uleb128 0xe
+ 1130 051d 46000000 		.4byte	.LVL20
+ 1131 0521 D7070000 		.4byte	0x7d7
+ 1132 0525 3B050000 		.4byte	0x53b
+ 1133 0529 0F       		.uleb128 0xf
+ 1134 052a 01       		.uleb128 0x1
+ 1135 052b 50       		.byte	0x50
+ 1136 052c 01       		.uleb128 0x1
+ 1137 052d 30       		.byte	0x30
+ 1138 052e 0F       		.uleb128 0xf
+ 1139 052f 01       		.uleb128 0x1
+ 1140 0530 51       		.byte	0x51
+ 1141 0531 01       		.uleb128 0x1
+ 1142 0532 31       		.byte	0x31
+ 1143 0533 0F       		.uleb128 0xf
+ 1144 0534 01       		.uleb128 0x1
+ 1145 0535 52       		.byte	0x52
+ 1146 0536 03       		.uleb128 0x3
+ 1147 0537 0A       		.byte	0xa
+ 1148 0538 CC0C     		.2byte	0xccc
+ 1149 053a 00       		.byte	0
+ 1150 053b 11       		.uleb128 0x11
+ 1151 053c 4A000000 		.4byte	.LVL21
+ 1152 0540 E2070000 		.4byte	0x7e2
+ 1153 0544 0E       		.uleb128 0xe
+ 1154 0545 52000000 		.4byte	.LVL22
+ 1155 0549 EE070000 		.4byte	0x7ee
+ 1156 054d 61050000 		.4byte	0x561
+ 1157 0551 0F       		.uleb128 0xf
+ 1158 0552 01       		.uleb128 0x1
+ 1159 0553 50       		.byte	0x50
+ 1160 0554 05       		.uleb128 0x5
+ 1161 0555 0C       		.byte	0xc
+ 1162 0556 00481300 		.4byte	0x134800
+ 1163 055a 0F       		.uleb128 0xf
+ 1164 055b 01       		.uleb128 0x1
+ 1165 055c 51       		.byte	0x51
+ 1166 055d 02       		.uleb128 0x2
+ 1167 055e 75       		.byte	0x75
+ 1168 055f 00       		.sleb128 0
+ 1169 0560 00       		.byte	0
+ 1170 0561 0E       		.uleb128 0xe
+ 1171 0562 5A000000 		.4byte	.LVL23
+ 1172 0566 FA070000 		.4byte	0x7fa
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 41
+
+
+ 1173 056a 75050000 		.4byte	0x575
+ 1174 056e 0F       		.uleb128 0xf
+ 1175 056f 01       		.uleb128 0x1
+ 1176 0570 50       		.byte	0x50
+ 1177 0571 02       		.uleb128 0x2
+ 1178 0572 09       		.byte	0x9
+ 1179 0573 FE       		.byte	0xfe
+ 1180 0574 00       		.byte	0
+ 1181 0575 0E       		.uleb128 0xe
+ 1182 0576 60000000 		.4byte	.LVL24
+ 1183 057a 06080000 		.4byte	0x806
+ 1184 057e 89050000 		.4byte	0x589
+ 1185 0582 0F       		.uleb128 0xf
+ 1186 0583 01       		.uleb128 0x1
+ 1187 0584 50       		.byte	0x50
+ 1188 0585 02       		.uleb128 0x2
+ 1189 0586 74       		.byte	0x74
+ 1190 0587 00       		.sleb128 0
+ 1191 0588 00       		.byte	0
+ 1192 0589 0E       		.uleb128 0xe
+ 1193 058a 68000000 		.4byte	.LVL25
+ 1194 058e 12080000 		.4byte	0x812
+ 1195 0592 A1050000 		.4byte	0x5a1
+ 1196 0596 0F       		.uleb128 0xf
+ 1197 0597 01       		.uleb128 0x1
+ 1198 0598 50       		.byte	0x50
+ 1199 0599 01       		.uleb128 0x1
+ 1200 059a 31       		.byte	0x31
+ 1201 059b 0F       		.uleb128 0xf
+ 1202 059c 01       		.uleb128 0x1
+ 1203 059d 51       		.byte	0x51
+ 1204 059e 01       		.uleb128 0x1
+ 1205 059f 3A       		.byte	0x3a
+ 1206 05a0 00       		.byte	0
+ 1207 05a1 0E       		.uleb128 0xe
+ 1208 05a2 6E000000 		.4byte	.LVL26
+ 1209 05a6 1E080000 		.4byte	0x81e
+ 1210 05aa B8050000 		.4byte	0x5b8
+ 1211 05ae 0F       		.uleb128 0xf
+ 1212 05af 01       		.uleb128 0x1
+ 1213 05b0 50       		.byte	0x50
+ 1214 05b1 05       		.uleb128 0x5
+ 1215 05b2 03       		.byte	0x3
+ 1216 05b3 00000000 		.4byte	AlarmIsrHandler
+ 1217 05b7 00       		.byte	0
+ 1218 05b8 11       		.uleb128 0x11
+ 1219 05b9 72000000 		.4byte	.LVL27
+ 1220 05bd 2A080000 		.4byte	0x82a
+ 1221 05c1 11       		.uleb128 0x11
+ 1222 05c2 78000000 		.4byte	.LVL29
+ 1223 05c6 36080000 		.4byte	0x836
+ 1224 05ca 0E       		.uleb128 0xe
+ 1225 05cb C0000000 		.4byte	.LVL39
+ 1226 05cf 42080000 		.4byte	0x842
+ 1227 05d3 EE050000 		.4byte	0x5ee
+ 1228 05d7 0F       		.uleb128 0xf
+ 1229 05d8 01       		.uleb128 0x1
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 42
+
+
+ 1230 05d9 50       		.byte	0x50
+ 1231 05da 02       		.uleb128 0x2
+ 1232 05db 91       		.byte	0x91
+ 1233 05dc 58       		.sleb128 -40
+ 1234 05dd 0F       		.uleb128 0xf
+ 1235 05de 01       		.uleb128 0x1
+ 1236 05df 51       		.byte	0x51
+ 1237 05e0 05       		.uleb128 0x5
+ 1238 05e1 03       		.byte	0x3
+ 1239 05e2 00000000 		.4byte	.LC6
+ 1240 05e6 0F       		.uleb128 0xf
+ 1241 05e7 02       		.uleb128 0x2
+ 1242 05e8 7D       		.byte	0x7d
+ 1243 05e9 00       		.sleb128 0
+ 1244 05ea 02       		.uleb128 0x2
+ 1245 05eb 75       		.byte	0x75
+ 1246 05ec 00       		.sleb128 0
+ 1247 05ed 00       		.byte	0
+ 1248 05ee 0E       		.uleb128 0xe
+ 1249 05ef 16010000 		.4byte	.LVL49
+ 1250 05f3 42080000 		.4byte	0x842
+ 1251 05f7 12060000 		.4byte	0x612
+ 1252 05fb 0F       		.uleb128 0xf
+ 1253 05fc 01       		.uleb128 0x1
+ 1254 05fd 50       		.byte	0x50
+ 1255 05fe 02       		.uleb128 0x2
+ 1256 05ff 91       		.byte	0x91
+ 1257 0600 48       		.sleb128 -56
+ 1258 0601 0F       		.uleb128 0xf
+ 1259 0602 01       		.uleb128 0x1
+ 1260 0603 51       		.byte	0x51
+ 1261 0604 05       		.uleb128 0x5
+ 1262 0605 03       		.byte	0x3
+ 1263 0606 18000000 		.4byte	.LC9
+ 1264 060a 0F       		.uleb128 0xf
+ 1265 060b 02       		.uleb128 0x2
+ 1266 060c 7D       		.byte	0x7d
+ 1267 060d 00       		.sleb128 0
+ 1268 060e 02       		.uleb128 0x2
+ 1269 060f 74       		.byte	0x74
+ 1270 0610 00       		.sleb128 0
+ 1271 0611 00       		.byte	0
+ 1272 0612 0E       		.uleb128 0xe
+ 1273 0613 1C010000 		.4byte	.LVL50
+ 1274 0617 4D080000 		.4byte	0x84d
+ 1275 061b 26060000 		.4byte	0x626
+ 1276 061f 0F       		.uleb128 0xf
+ 1277 0620 01       		.uleb128 0x1
+ 1278 0621 50       		.byte	0x50
+ 1279 0622 02       		.uleb128 0x2
+ 1280 0623 91       		.byte	0x91
+ 1281 0624 58       		.sleb128 -40
+ 1282 0625 00       		.byte	0
+ 1283 0626 0E       		.uleb128 0xe
+ 1284 0627 24010000 		.4byte	.LVL51
+ 1285 062b 4D080000 		.4byte	0x84d
+ 1286 062f 3A060000 		.4byte	0x63a
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 43
+
+
+ 1287 0633 0F       		.uleb128 0xf
+ 1288 0634 01       		.uleb128 0x1
+ 1289 0635 50       		.byte	0x50
+ 1290 0636 02       		.uleb128 0x2
+ 1291 0637 74       		.byte	0x74
+ 1292 0638 00       		.sleb128 0
+ 1293 0639 00       		.byte	0
+ 1294 063a 0E       		.uleb128 0xe
+ 1295 063b 2A010000 		.4byte	.LVL52
+ 1296 063f 4D080000 		.4byte	0x84d
+ 1297 0643 4E060000 		.4byte	0x64e
+ 1298 0647 0F       		.uleb128 0xf
+ 1299 0648 01       		.uleb128 0x1
+ 1300 0649 50       		.byte	0x50
+ 1301 064a 02       		.uleb128 0x2
+ 1302 064b 91       		.byte	0x91
+ 1303 064c 48       		.sleb128 -56
+ 1304 064d 00       		.byte	0
+ 1305 064e 0E       		.uleb128 0xe
+ 1306 064f 30010000 		.4byte	.LVL53
+ 1307 0653 4D080000 		.4byte	0x84d
+ 1308 0657 62060000 		.4byte	0x662
+ 1309 065b 0F       		.uleb128 0xf
+ 1310 065c 01       		.uleb128 0x1
+ 1311 065d 50       		.byte	0x50
+ 1312 065e 02       		.uleb128 0x2
+ 1313 065f 74       		.byte	0x74
+ 1314 0660 00       		.sleb128 0
+ 1315 0661 00       		.byte	0
+ 1316 0662 0E       		.uleb128 0xe
+ 1317 0663 3C010000 		.4byte	.LVL54
+ 1318 0667 4D080000 		.4byte	0x84d
+ 1319 066b 79060000 		.4byte	0x679
+ 1320 066f 0F       		.uleb128 0xf
+ 1321 0670 01       		.uleb128 0x1
+ 1322 0671 50       		.byte	0x50
+ 1323 0672 05       		.uleb128 0x5
+ 1324 0673 03       		.byte	0x3
+ 1325 0674 30000000 		.4byte	.LC13
+ 1326 0678 00       		.byte	0
+ 1327 0679 0E       		.uleb128 0xe
+ 1328 067a 4A010000 		.4byte	.LVL55
+ 1329 067e 4D080000 		.4byte	0x84d
+ 1330 0682 90060000 		.4byte	0x690
+ 1331 0686 0F       		.uleb128 0xf
+ 1332 0687 01       		.uleb128 0x1
+ 1333 0688 50       		.byte	0x50
+ 1334 0689 05       		.uleb128 0x5
+ 1335 068a 03       		.byte	0x3
+ 1336 068b 3C000000 		.4byte	.LC15
+ 1337 068f 00       		.byte	0
+ 1338 0690 0E       		.uleb128 0xe
+ 1339 0691 50010000 		.4byte	.LVL56
+ 1340 0695 4D080000 		.4byte	0x84d
+ 1341 0699 A7060000 		.4byte	0x6a7
+ 1342 069d 0F       		.uleb128 0xf
+ 1343 069e 01       		.uleb128 0x1
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 44
+
+
+ 1344 069f 50       		.byte	0x50
+ 1345 06a0 05       		.uleb128 0x5
+ 1346 06a1 03       		.byte	0x3
+ 1347 06a2 48000000 		.4byte	.LC17
+ 1348 06a6 00       		.byte	0
+ 1349 06a7 11       		.uleb128 0x11
+ 1350 06a8 54010000 		.4byte	.LVL57
+ 1351 06ac 58080000 		.4byte	0x858
+ 1352 06b0 00       		.byte	0
+ 1353 06b1 19       		.uleb128 0x19
+ 1354 06b2 9D000000 		.4byte	0x9d
+ 1355 06b6 C1060000 		.4byte	0x6c1
+ 1356 06ba 1A       		.uleb128 0x1a
+ 1357 06bb C4000000 		.4byte	0xc4
+ 1358 06bf 0F       		.byte	0xf
+ 1359 06c0 00       		.byte	0
+ 1360 06c1 19       		.uleb128 0x19
+ 1361 06c2 D1060000 		.4byte	0x6d1
+ 1362 06c6 D1060000 		.4byte	0x6d1
+ 1363 06ca 1A       		.uleb128 0x1a
+ 1364 06cb C4000000 		.4byte	0xc4
+ 1365 06cf 0B       		.byte	0xb
+ 1366 06d0 00       		.byte	0
+ 1367 06d1 1B       		.uleb128 0x1b
+ 1368 06d2 77000000 		.4byte	0x77
+ 1369 06d6 1C       		.uleb128 0x1c
+ 1370 06d7 BB000000 		.4byte	.LASF37
+ 1371 06db 02       		.byte	0x2
+ 1372 06dc E001     		.2byte	0x1e0
+ 1373 06de E2060000 		.4byte	0x6e2
+ 1374 06e2 1B       		.uleb128 0x1b
+ 1375 06e3 C1060000 		.4byte	0x6c1
+ 1376 06e7 1D       		.uleb128 0x1d
+ 1377 06e8 E0010000 		.4byte	.LASF38
+ 1378 06ec 01       		.byte	0x1
+ 1379 06ed 3E       		.byte	0x3e
+ 1380 06ee 04010000 		.4byte	0x104
+ 1381 06f2 05       		.uleb128 0x5
+ 1382 06f3 03       		.byte	0x3
+ 1383 06f4 00000000 		.4byte	alarmTimeDate
+ 1384 06f8 1D       		.uleb128 0x1d
+ 1385 06f9 A2010000 		.4byte	.LASF39
+ 1386 06fd 01       		.byte	0x1
+ 1387 06fe 41       		.byte	0x41
+ 1388 06ff 83000000 		.4byte	0x83
+ 1389 0703 05       		.uleb128 0x5
+ 1390 0704 03       		.byte	0x3
+ 1391 0705 00000000 		.4byte	alarmFlag
+ 1392 0709 1D       		.uleb128 0x1d
+ 1393 070a FB030000 		.4byte	.LASF40
+ 1394 070e 01       		.byte	0x1
+ 1395 070f 48       		.byte	0x48
+ 1396 0710 83000000 		.4byte	0x83
+ 1397 0714 05       		.uleb128 0x5
+ 1398 0715 03       		.byte	0x3
+ 1399 0716 00000000 		.4byte	ui100mS
+ 1400 071a 1E       		.uleb128 0x1e
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 45
+
+
+ 1401 071b 2E020000 		.4byte	.LASF41
+ 1402 071f 2E020000 		.4byte	.LASF41
+ 1403 0723 04       		.byte	0x4
+ 1404 0724 45       		.byte	0x45
+ 1405 0725 1E       		.uleb128 0x1e
+ 1406 0726 FC010000 		.4byte	.LASF42
+ 1407 072a FC010000 		.4byte	.LASF42
+ 1408 072e 04       		.byte	0x4
+ 1409 072f 6D       		.byte	0x6d
+ 1410 0730 1E       		.uleb128 0x1e
+ 1411 0731 B2010000 		.4byte	.LASF43
+ 1412 0735 B2010000 		.4byte	.LASF43
+ 1413 0739 04       		.byte	0x4
+ 1414 073a 6A       		.byte	0x6a
+ 1415 073b 1E       		.uleb128 0x1e
+ 1416 073c 9C040000 		.4byte	.LASF44
+ 1417 0740 9C040000 		.4byte	.LASF44
+ 1418 0744 04       		.byte	0x4
+ 1419 0745 70       		.byte	0x70
+ 1420 0746 1E       		.uleb128 0x1e
+ 1421 0747 00000000 		.4byte	.LASF45
+ 1422 074b 00000000 		.4byte	.LASF45
+ 1423 074f 04       		.byte	0x4
+ 1424 0750 6C       		.byte	0x6c
+ 1425 0751 1E       		.uleb128 0x1e
+ 1426 0752 42040000 		.4byte	.LASF46
+ 1427 0756 42040000 		.4byte	.LASF46
+ 1428 075a 04       		.byte	0x4
+ 1429 075b 78       		.byte	0x78
+ 1430 075c 1E       		.uleb128 0x1e
+ 1431 075d 15020000 		.4byte	.LASF47
+ 1432 0761 15020000 		.4byte	.LASF47
+ 1433 0765 04       		.byte	0x4
+ 1434 0766 7D       		.byte	0x7d
+ 1435 0767 1E       		.uleb128 0x1e
+ 1436 0768 CE020000 		.4byte	.LASF48
+ 1437 076c CE020000 		.4byte	.LASF48
+ 1438 0770 05       		.byte	0x5
+ 1439 0771 36       		.byte	0x36
+ 1440 0772 1E       		.uleb128 0x1e
+ 1441 0773 CA010000 		.4byte	.LASF49
+ 1442 0777 CA010000 		.4byte	.LASF49
+ 1443 077b 06       		.byte	0x6
+ 1444 077c 32       		.byte	0x32
+ 1445 077d 1E       		.uleb128 0x1e
+ 1446 077e 2A030000 		.4byte	.LASF50
+ 1447 0782 2A030000 		.4byte	.LASF50
+ 1448 0786 06       		.byte	0x6
+ 1449 0787 33       		.byte	0x33
+ 1450 0788 1F       		.uleb128 0x1f
+ 1451 0789 B7020000 		.4byte	.LASF51
+ 1452 078d B7020000 		.4byte	.LASF51
+ 1453 0791 02       		.byte	0x2
+ 1454 0792 0402     		.2byte	0x204
+ 1455 0794 1E       		.uleb128 0x1e
+ 1456 0795 E8000000 		.4byte	.LASF52
+ 1457 0799 E8000000 		.4byte	.LASF52
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 46
+
+
+ 1458 079d 07       		.byte	0x7
+ 1459 079e 32       		.byte	0x32
+ 1460 079f 1E       		.uleb128 0x1e
+ 1461 07a0 0F000000 		.4byte	.LASF53
+ 1462 07a4 0F000000 		.4byte	.LASF53
+ 1463 07a8 07       		.byte	0x7
+ 1464 07a9 33       		.byte	0x33
+ 1465 07aa 1F       		.uleb128 0x1f
+ 1466 07ab 3B030000 		.4byte	.LASF54
+ 1467 07af 3B030000 		.4byte	.LASF54
+ 1468 07b3 02       		.byte	0x2
+ 1469 07b4 FD01     		.2byte	0x1fd
+ 1470 07b6 1E       		.uleb128 0x1e
+ 1471 07b7 FC020000 		.4byte	.LASF55
+ 1472 07bb FC020000 		.4byte	.LASF55
+ 1473 07bf 04       		.byte	0x4
+ 1474 07c0 4E       		.byte	0x4e
+ 1475 07c1 1E       		.uleb128 0x1e
+ 1476 07c2 1A030000 		.4byte	.LASF56
+ 1477 07c6 1A030000 		.4byte	.LASF56
+ 1478 07ca 04       		.byte	0x4
+ 1479 07cb 67       		.byte	0x67
+ 1480 07cc 1E       		.uleb128 0x1e
+ 1481 07cd 5F040000 		.4byte	.LASF57
+ 1482 07d1 5F040000 		.4byte	.LASF57
+ 1483 07d5 04       		.byte	0x4
+ 1484 07d6 7E       		.byte	0x7e
+ 1485 07d7 1E       		.uleb128 0x1e
+ 1486 07d8 0F040000 		.4byte	.LASF58
+ 1487 07dc 0F040000 		.4byte	.LASF58
+ 1488 07e0 04       		.byte	0x4
+ 1489 07e1 7A       		.byte	0x7a
+ 1490 07e2 1F       		.uleb128 0x1f
+ 1491 07e3 AD040000 		.4byte	.LASF59
+ 1492 07e7 AD040000 		.4byte	.LASF59
+ 1493 07eb 02       		.byte	0x2
+ 1494 07ec EB01     		.2byte	0x1eb
+ 1495 07ee 1F       		.uleb128 0x1f
+ 1496 07ef 53020000 		.4byte	.LASF60
+ 1497 07f3 53020000 		.4byte	.LASF60
+ 1498 07f7 02       		.byte	0x2
+ 1499 07f8 F301     		.2byte	0x1f3
+ 1500 07fa 1F       		.uleb128 0x1f
+ 1501 07fb 1F000000 		.4byte	.LASF61
+ 1502 07ff 1F000000 		.4byte	.LASF61
+ 1503 0803 02       		.byte	0x2
+ 1504 0804 F901     		.2byte	0x1f9
+ 1505 0806 1F       		.uleb128 0x1f
+ 1506 0807 97020000 		.4byte	.LASF62
+ 1507 080b 97020000 		.4byte	.LASF62
+ 1508 080f 02       		.byte	0x2
+ 1509 0810 F701     		.2byte	0x1f7
+ 1510 0812 1F       		.uleb128 0x1f
+ 1511 0813 47000000 		.4byte	.LASF63
+ 1512 0817 47000000 		.4byte	.LASF63
+ 1513 081b 02       		.byte	0x2
+ 1514 081c F001     		.2byte	0x1f0
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 47
+
+
+ 1515 081e 1F       		.uleb128 0x1f
+ 1516 081f A4030000 		.4byte	.LASF64
+ 1517 0823 A4030000 		.4byte	.LASF64
+ 1518 0827 02       		.byte	0x2
+ 1519 0828 0502     		.2byte	0x205
+ 1520 082a 1F       		.uleb128 0x1f
+ 1521 082b D2000000 		.4byte	.LASF65
+ 1522 082f D2000000 		.4byte	.LASF65
+ 1523 0833 02       		.byte	0x2
+ 1524 0834 F501     		.2byte	0x1f5
+ 1525 0836 1F       		.uleb128 0x1f
+ 1526 0837 03040000 		.4byte	.LASF66
+ 1527 083b 03040000 		.4byte	.LASF66
+ 1528 083f 02       		.byte	0x2
+ 1529 0840 F601     		.2byte	0x1f6
+ 1530 0842 1E       		.uleb128 0x1e
+ 1531 0843 AF020000 		.4byte	.LASF67
+ 1532 0847 AF020000 		.4byte	.LASF67
+ 1533 084b 08       		.byte	0x8
+ 1534 084c E7       		.byte	0xe7
+ 1535 084d 1E       		.uleb128 0x1e
+ 1536 084e 05010000 		.4byte	.LASF68
+ 1537 0852 05010000 		.4byte	.LASF68
+ 1538 0856 09       		.byte	0x9
+ 1539 0857 26       		.byte	0x26
+ 1540 0858 1E       		.uleb128 0x1e
+ 1541 0859 79030000 		.4byte	.LASF69
+ 1542 085d 79030000 		.4byte	.LASF69
+ 1543 0861 0A       		.byte	0xa
+ 1544 0862 57       		.byte	0x57
+ 1545 0863 00       		.byte	0
+ 1546              		.section	.debug_abbrev,"",%progbits
+ 1547              	.Ldebug_abbrev0:
+ 1548 0000 01       		.uleb128 0x1
+ 1549 0001 11       		.uleb128 0x11
+ 1550 0002 01       		.byte	0x1
+ 1551 0003 25       		.uleb128 0x25
+ 1552 0004 0E       		.uleb128 0xe
+ 1553 0005 13       		.uleb128 0x13
+ 1554 0006 0B       		.uleb128 0xb
+ 1555 0007 03       		.uleb128 0x3
+ 1556 0008 0E       		.uleb128 0xe
+ 1557 0009 1B       		.uleb128 0x1b
+ 1558 000a 0E       		.uleb128 0xe
+ 1559 000b 55       		.uleb128 0x55
+ 1560 000c 17       		.uleb128 0x17
+ 1561 000d 11       		.uleb128 0x11
+ 1562 000e 01       		.uleb128 0x1
+ 1563 000f 10       		.uleb128 0x10
+ 1564 0010 17       		.uleb128 0x17
+ 1565 0011 00       		.byte	0
+ 1566 0012 00       		.byte	0
+ 1567 0013 02       		.uleb128 0x2
+ 1568 0014 24       		.uleb128 0x24
+ 1569 0015 00       		.byte	0
+ 1570 0016 0B       		.uleb128 0xb
+ 1571 0017 0B       		.uleb128 0xb
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 48
+
+
+ 1572 0018 3E       		.uleb128 0x3e
+ 1573 0019 0B       		.uleb128 0xb
+ 1574 001a 03       		.uleb128 0x3
+ 1575 001b 0E       		.uleb128 0xe
+ 1576 001c 00       		.byte	0
+ 1577 001d 00       		.byte	0
+ 1578 001e 03       		.uleb128 0x3
+ 1579 001f 24       		.uleb128 0x24
+ 1580 0020 00       		.byte	0
+ 1581 0021 0B       		.uleb128 0xb
+ 1582 0022 0B       		.uleb128 0xb
+ 1583 0023 3E       		.uleb128 0x3e
+ 1584 0024 0B       		.uleb128 0xb
+ 1585 0025 03       		.uleb128 0x3
+ 1586 0026 08       		.uleb128 0x8
+ 1587 0027 00       		.byte	0
+ 1588 0028 00       		.byte	0
+ 1589 0029 04       		.uleb128 0x4
+ 1590 002a 16       		.uleb128 0x16
+ 1591 002b 00       		.byte	0
+ 1592 002c 03       		.uleb128 0x3
+ 1593 002d 0E       		.uleb128 0xe
+ 1594 002e 3A       		.uleb128 0x3a
+ 1595 002f 0B       		.uleb128 0xb
+ 1596 0030 3B       		.uleb128 0x3b
+ 1597 0031 05       		.uleb128 0x5
+ 1598 0032 49       		.uleb128 0x49
+ 1599 0033 13       		.uleb128 0x13
+ 1600 0034 00       		.byte	0
+ 1601 0035 00       		.byte	0
+ 1602 0036 05       		.uleb128 0x5
+ 1603 0037 04       		.uleb128 0x4
+ 1604 0038 01       		.byte	0x1
+ 1605 0039 0B       		.uleb128 0xb
+ 1606 003a 0B       		.uleb128 0xb
+ 1607 003b 49       		.uleb128 0x49
+ 1608 003c 13       		.uleb128 0x13
+ 1609 003d 3A       		.uleb128 0x3a
+ 1610 003e 0B       		.uleb128 0xb
+ 1611 003f 3B       		.uleb128 0x3b
+ 1612 0040 0B       		.uleb128 0xb
+ 1613 0041 01       		.uleb128 0x1
+ 1614 0042 13       		.uleb128 0x13
+ 1615 0043 00       		.byte	0
+ 1616 0044 00       		.byte	0
+ 1617 0045 06       		.uleb128 0x6
+ 1618 0046 28       		.uleb128 0x28
+ 1619 0047 00       		.byte	0
+ 1620 0048 03       		.uleb128 0x3
+ 1621 0049 0E       		.uleb128 0xe
+ 1622 004a 1C       		.uleb128 0x1c
+ 1623 004b 0B       		.uleb128 0xb
+ 1624 004c 00       		.byte	0
+ 1625 004d 00       		.byte	0
+ 1626 004e 07       		.uleb128 0x7
+ 1627 004f 13       		.uleb128 0x13
+ 1628 0050 01       		.byte	0x1
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 49
+
+
+ 1629 0051 0B       		.uleb128 0xb
+ 1630 0052 0B       		.uleb128 0xb
+ 1631 0053 3A       		.uleb128 0x3a
+ 1632 0054 0B       		.uleb128 0xb
+ 1633 0055 3B       		.uleb128 0x3b
+ 1634 0056 0B       		.uleb128 0xb
+ 1635 0057 01       		.uleb128 0x1
+ 1636 0058 13       		.uleb128 0x13
+ 1637 0059 00       		.byte	0
+ 1638 005a 00       		.byte	0
+ 1639 005b 08       		.uleb128 0x8
+ 1640 005c 0D       		.uleb128 0xd
+ 1641 005d 00       		.byte	0
+ 1642 005e 03       		.uleb128 0x3
+ 1643 005f 0E       		.uleb128 0xe
+ 1644 0060 3A       		.uleb128 0x3a
+ 1645 0061 0B       		.uleb128 0xb
+ 1646 0062 3B       		.uleb128 0x3b
+ 1647 0063 0B       		.uleb128 0xb
+ 1648 0064 49       		.uleb128 0x49
+ 1649 0065 13       		.uleb128 0x13
+ 1650 0066 38       		.uleb128 0x38
+ 1651 0067 0B       		.uleb128 0xb
+ 1652 0068 00       		.byte	0
+ 1653 0069 00       		.byte	0
+ 1654 006a 09       		.uleb128 0x9
+ 1655 006b 16       		.uleb128 0x16
+ 1656 006c 00       		.byte	0
+ 1657 006d 03       		.uleb128 0x3
+ 1658 006e 0E       		.uleb128 0xe
+ 1659 006f 3A       		.uleb128 0x3a
+ 1660 0070 0B       		.uleb128 0xb
+ 1661 0071 3B       		.uleb128 0x3b
+ 1662 0072 0B       		.uleb128 0xb
+ 1663 0073 49       		.uleb128 0x49
+ 1664 0074 13       		.uleb128 0x13
+ 1665 0075 00       		.byte	0
+ 1666 0076 00       		.byte	0
+ 1667 0077 0A       		.uleb128 0xa
+ 1668 0078 2E       		.uleb128 0x2e
+ 1669 0079 01       		.byte	0x1
+ 1670 007a 03       		.uleb128 0x3
+ 1671 007b 0E       		.uleb128 0xe
+ 1672 007c 3A       		.uleb128 0x3a
+ 1673 007d 0B       		.uleb128 0xb
+ 1674 007e 3B       		.uleb128 0x3b
+ 1675 007f 05       		.uleb128 0x5
+ 1676 0080 27       		.uleb128 0x27
+ 1677 0081 19       		.uleb128 0x19
+ 1678 0082 49       		.uleb128 0x49
+ 1679 0083 13       		.uleb128 0x13
+ 1680 0084 20       		.uleb128 0x20
+ 1681 0085 0B       		.uleb128 0xb
+ 1682 0086 01       		.uleb128 0x1
+ 1683 0087 13       		.uleb128 0x13
+ 1684 0088 00       		.byte	0
+ 1685 0089 00       		.byte	0
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 50
+
+
+ 1686 008a 0B       		.uleb128 0xb
+ 1687 008b 05       		.uleb128 0x5
+ 1688 008c 00       		.byte	0
+ 1689 008d 03       		.uleb128 0x3
+ 1690 008e 0E       		.uleb128 0xe
+ 1691 008f 3A       		.uleb128 0x3a
+ 1692 0090 0B       		.uleb128 0xb
+ 1693 0091 3B       		.uleb128 0x3b
+ 1694 0092 05       		.uleb128 0x5
+ 1695 0093 49       		.uleb128 0x49
+ 1696 0094 13       		.uleb128 0x13
+ 1697 0095 00       		.byte	0
+ 1698 0096 00       		.byte	0
+ 1699 0097 0C       		.uleb128 0xc
+ 1700 0098 34       		.uleb128 0x34
+ 1701 0099 00       		.byte	0
+ 1702 009a 03       		.uleb128 0x3
+ 1703 009b 0E       		.uleb128 0xe
+ 1704 009c 3A       		.uleb128 0x3a
+ 1705 009d 0B       		.uleb128 0xb
+ 1706 009e 3B       		.uleb128 0x3b
+ 1707 009f 05       		.uleb128 0x5
+ 1708 00a0 49       		.uleb128 0x49
+ 1709 00a1 13       		.uleb128 0x13
+ 1710 00a2 00       		.byte	0
+ 1711 00a3 00       		.byte	0
+ 1712 00a4 0D       		.uleb128 0xd
+ 1713 00a5 2E       		.uleb128 0x2e
+ 1714 00a6 01       		.byte	0x1
+ 1715 00a7 3F       		.uleb128 0x3f
+ 1716 00a8 19       		.uleb128 0x19
+ 1717 00a9 03       		.uleb128 0x3
+ 1718 00aa 0E       		.uleb128 0xe
+ 1719 00ab 3A       		.uleb128 0x3a
+ 1720 00ac 0B       		.uleb128 0xb
+ 1721 00ad 3B       		.uleb128 0x3b
+ 1722 00ae 0B       		.uleb128 0xb
+ 1723 00af 27       		.uleb128 0x27
+ 1724 00b0 19       		.uleb128 0x19
+ 1725 00b1 11       		.uleb128 0x11
+ 1726 00b2 01       		.uleb128 0x1
+ 1727 00b3 12       		.uleb128 0x12
+ 1728 00b4 06       		.uleb128 0x6
+ 1729 00b5 40       		.uleb128 0x40
+ 1730 00b6 18       		.uleb128 0x18
+ 1731 00b7 9742     		.uleb128 0x2117
+ 1732 00b9 19       		.uleb128 0x19
+ 1733 00ba 01       		.uleb128 0x1
+ 1734 00bb 13       		.uleb128 0x13
+ 1735 00bc 00       		.byte	0
+ 1736 00bd 00       		.byte	0
+ 1737 00be 0E       		.uleb128 0xe
+ 1738 00bf 898201   		.uleb128 0x4109
+ 1739 00c2 01       		.byte	0x1
+ 1740 00c3 11       		.uleb128 0x11
+ 1741 00c4 01       		.uleb128 0x1
+ 1742 00c5 31       		.uleb128 0x31
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 51
+
+
+ 1743 00c6 13       		.uleb128 0x13
+ 1744 00c7 01       		.uleb128 0x1
+ 1745 00c8 13       		.uleb128 0x13
+ 1746 00c9 00       		.byte	0
+ 1747 00ca 00       		.byte	0
+ 1748 00cb 0F       		.uleb128 0xf
+ 1749 00cc 8A8201   		.uleb128 0x410a
+ 1750 00cf 00       		.byte	0
+ 1751 00d0 02       		.uleb128 0x2
+ 1752 00d1 18       		.uleb128 0x18
+ 1753 00d2 9142     		.uleb128 0x2111
+ 1754 00d4 18       		.uleb128 0x18
+ 1755 00d5 00       		.byte	0
+ 1756 00d6 00       		.byte	0
+ 1757 00d7 10       		.uleb128 0x10
+ 1758 00d8 898201   		.uleb128 0x4109
+ 1759 00db 01       		.byte	0x1
+ 1760 00dc 11       		.uleb128 0x11
+ 1761 00dd 01       		.uleb128 0x1
+ 1762 00de 31       		.uleb128 0x31
+ 1763 00df 13       		.uleb128 0x13
+ 1764 00e0 00       		.byte	0
+ 1765 00e1 00       		.byte	0
+ 1766 00e2 11       		.uleb128 0x11
+ 1767 00e3 898201   		.uleb128 0x4109
+ 1768 00e6 00       		.byte	0
+ 1769 00e7 11       		.uleb128 0x11
+ 1770 00e8 01       		.uleb128 0x1
+ 1771 00e9 31       		.uleb128 0x31
+ 1772 00ea 13       		.uleb128 0x13
+ 1773 00eb 00       		.byte	0
+ 1774 00ec 00       		.byte	0
+ 1775 00ed 12       		.uleb128 0x12
+ 1776 00ee 2E       		.uleb128 0x2e
+ 1777 00ef 01       		.byte	0x1
+ 1778 00f0 3F       		.uleb128 0x3f
+ 1779 00f1 19       		.uleb128 0x19
+ 1780 00f2 03       		.uleb128 0x3
+ 1781 00f3 0E       		.uleb128 0xe
+ 1782 00f4 3A       		.uleb128 0x3a
+ 1783 00f5 0B       		.uleb128 0xb
+ 1784 00f6 3B       		.uleb128 0x3b
+ 1785 00f7 0B       		.uleb128 0xb
+ 1786 00f8 49       		.uleb128 0x49
+ 1787 00f9 13       		.uleb128 0x13
+ 1788 00fa 8701     		.uleb128 0x87
+ 1789 00fc 19       		.uleb128 0x19
+ 1790 00fd 11       		.uleb128 0x11
+ 1791 00fe 01       		.uleb128 0x1
+ 1792 00ff 12       		.uleb128 0x12
+ 1793 0100 06       		.uleb128 0x6
+ 1794 0101 40       		.uleb128 0x40
+ 1795 0102 18       		.uleb128 0x18
+ 1796 0103 9742     		.uleb128 0x2117
+ 1797 0105 19       		.uleb128 0x19
+ 1798 0106 01       		.uleb128 0x1
+ 1799 0107 13       		.uleb128 0x13
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 52
+
+
+ 1800 0108 00       		.byte	0
+ 1801 0109 00       		.byte	0
+ 1802 010a 13       		.uleb128 0x13
+ 1803 010b 34       		.uleb128 0x34
+ 1804 010c 00       		.byte	0
+ 1805 010d 03       		.uleb128 0x3
+ 1806 010e 0E       		.uleb128 0xe
+ 1807 010f 3A       		.uleb128 0x3a
+ 1808 0110 0B       		.uleb128 0xb
+ 1809 0111 3B       		.uleb128 0x3b
+ 1810 0112 0B       		.uleb128 0xb
+ 1811 0113 49       		.uleb128 0x49
+ 1812 0114 13       		.uleb128 0x13
+ 1813 0115 02       		.uleb128 0x2
+ 1814 0116 18       		.uleb128 0x18
+ 1815 0117 00       		.byte	0
+ 1816 0118 00       		.byte	0
+ 1817 0119 14       		.uleb128 0x14
+ 1818 011a 34       		.uleb128 0x34
+ 1819 011b 00       		.byte	0
+ 1820 011c 03       		.uleb128 0x3
+ 1821 011d 0E       		.uleb128 0xe
+ 1822 011e 3A       		.uleb128 0x3a
+ 1823 011f 0B       		.uleb128 0xb
+ 1824 0120 3B       		.uleb128 0x3b
+ 1825 0121 0B       		.uleb128 0xb
+ 1826 0122 49       		.uleb128 0x49
+ 1827 0123 13       		.uleb128 0x13
+ 1828 0124 02       		.uleb128 0x2
+ 1829 0125 17       		.uleb128 0x17
+ 1830 0126 00       		.byte	0
+ 1831 0127 00       		.byte	0
+ 1832 0128 15       		.uleb128 0x15
+ 1833 0129 1D       		.uleb128 0x1d
+ 1834 012a 01       		.byte	0x1
+ 1835 012b 31       		.uleb128 0x31
+ 1836 012c 13       		.uleb128 0x13
+ 1837 012d 11       		.uleb128 0x11
+ 1838 012e 01       		.uleb128 0x1
+ 1839 012f 12       		.uleb128 0x12
+ 1840 0130 06       		.uleb128 0x6
+ 1841 0131 58       		.uleb128 0x58
+ 1842 0132 0B       		.uleb128 0xb
+ 1843 0133 59       		.uleb128 0x59
+ 1844 0134 0B       		.uleb128 0xb
+ 1845 0135 01       		.uleb128 0x1
+ 1846 0136 13       		.uleb128 0x13
+ 1847 0137 00       		.byte	0
+ 1848 0138 00       		.byte	0
+ 1849 0139 16       		.uleb128 0x16
+ 1850 013a 05       		.uleb128 0x5
+ 1851 013b 00       		.byte	0
+ 1852 013c 31       		.uleb128 0x31
+ 1853 013d 13       		.uleb128 0x13
+ 1854 013e 02       		.uleb128 0x2
+ 1855 013f 17       		.uleb128 0x17
+ 1856 0140 00       		.byte	0
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 53
+
+
+ 1857 0141 00       		.byte	0
+ 1858 0142 17       		.uleb128 0x17
+ 1859 0143 0B       		.uleb128 0xb
+ 1860 0144 01       		.byte	0x1
+ 1861 0145 11       		.uleb128 0x11
+ 1862 0146 01       		.uleb128 0x1
+ 1863 0147 12       		.uleb128 0x12
+ 1864 0148 06       		.uleb128 0x6
+ 1865 0149 00       		.byte	0
+ 1866 014a 00       		.byte	0
+ 1867 014b 18       		.uleb128 0x18
+ 1868 014c 34       		.uleb128 0x34
+ 1869 014d 00       		.byte	0
+ 1870 014e 31       		.uleb128 0x31
+ 1871 014f 13       		.uleb128 0x13
+ 1872 0150 02       		.uleb128 0x2
+ 1873 0151 17       		.uleb128 0x17
+ 1874 0152 00       		.byte	0
+ 1875 0153 00       		.byte	0
+ 1876 0154 19       		.uleb128 0x19
+ 1877 0155 01       		.uleb128 0x1
+ 1878 0156 01       		.byte	0x1
+ 1879 0157 49       		.uleb128 0x49
+ 1880 0158 13       		.uleb128 0x13
+ 1881 0159 01       		.uleb128 0x1
+ 1882 015a 13       		.uleb128 0x13
+ 1883 015b 00       		.byte	0
+ 1884 015c 00       		.byte	0
+ 1885 015d 1A       		.uleb128 0x1a
+ 1886 015e 21       		.uleb128 0x21
+ 1887 015f 00       		.byte	0
+ 1888 0160 49       		.uleb128 0x49
+ 1889 0161 13       		.uleb128 0x13
+ 1890 0162 2F       		.uleb128 0x2f
+ 1891 0163 0B       		.uleb128 0xb
+ 1892 0164 00       		.byte	0
+ 1893 0165 00       		.byte	0
+ 1894 0166 1B       		.uleb128 0x1b
+ 1895 0167 26       		.uleb128 0x26
+ 1896 0168 00       		.byte	0
+ 1897 0169 49       		.uleb128 0x49
+ 1898 016a 13       		.uleb128 0x13
+ 1899 016b 00       		.byte	0
+ 1900 016c 00       		.byte	0
+ 1901 016d 1C       		.uleb128 0x1c
+ 1902 016e 34       		.uleb128 0x34
+ 1903 016f 00       		.byte	0
+ 1904 0170 03       		.uleb128 0x3
+ 1905 0171 0E       		.uleb128 0xe
+ 1906 0172 3A       		.uleb128 0x3a
+ 1907 0173 0B       		.uleb128 0xb
+ 1908 0174 3B       		.uleb128 0x3b
+ 1909 0175 05       		.uleb128 0x5
+ 1910 0176 49       		.uleb128 0x49
+ 1911 0177 13       		.uleb128 0x13
+ 1912 0178 3F       		.uleb128 0x3f
+ 1913 0179 19       		.uleb128 0x19
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 54
+
+
+ 1914 017a 3C       		.uleb128 0x3c
+ 1915 017b 19       		.uleb128 0x19
+ 1916 017c 00       		.byte	0
+ 1917 017d 00       		.byte	0
+ 1918 017e 1D       		.uleb128 0x1d
+ 1919 017f 34       		.uleb128 0x34
+ 1920 0180 00       		.byte	0
+ 1921 0181 03       		.uleb128 0x3
+ 1922 0182 0E       		.uleb128 0xe
+ 1923 0183 3A       		.uleb128 0x3a
+ 1924 0184 0B       		.uleb128 0xb
+ 1925 0185 3B       		.uleb128 0x3b
+ 1926 0186 0B       		.uleb128 0xb
+ 1927 0187 49       		.uleb128 0x49
+ 1928 0188 13       		.uleb128 0x13
+ 1929 0189 3F       		.uleb128 0x3f
+ 1930 018a 19       		.uleb128 0x19
+ 1931 018b 02       		.uleb128 0x2
+ 1932 018c 18       		.uleb128 0x18
+ 1933 018d 00       		.byte	0
+ 1934 018e 00       		.byte	0
+ 1935 018f 1E       		.uleb128 0x1e
+ 1936 0190 2E       		.uleb128 0x2e
+ 1937 0191 00       		.byte	0
+ 1938 0192 3F       		.uleb128 0x3f
+ 1939 0193 19       		.uleb128 0x19
+ 1940 0194 3C       		.uleb128 0x3c
+ 1941 0195 19       		.uleb128 0x19
+ 1942 0196 6E       		.uleb128 0x6e
+ 1943 0197 0E       		.uleb128 0xe
+ 1944 0198 03       		.uleb128 0x3
+ 1945 0199 0E       		.uleb128 0xe
+ 1946 019a 3A       		.uleb128 0x3a
+ 1947 019b 0B       		.uleb128 0xb
+ 1948 019c 3B       		.uleb128 0x3b
+ 1949 019d 0B       		.uleb128 0xb
+ 1950 019e 00       		.byte	0
+ 1951 019f 00       		.byte	0
+ 1952 01a0 1F       		.uleb128 0x1f
+ 1953 01a1 2E       		.uleb128 0x2e
+ 1954 01a2 00       		.byte	0
+ 1955 01a3 3F       		.uleb128 0x3f
+ 1956 01a4 19       		.uleb128 0x19
+ 1957 01a5 3C       		.uleb128 0x3c
+ 1958 01a6 19       		.uleb128 0x19
+ 1959 01a7 6E       		.uleb128 0x6e
+ 1960 01a8 0E       		.uleb128 0xe
+ 1961 01a9 03       		.uleb128 0x3
+ 1962 01aa 0E       		.uleb128 0xe
+ 1963 01ab 3A       		.uleb128 0x3a
+ 1964 01ac 0B       		.uleb128 0xb
+ 1965 01ad 3B       		.uleb128 0x3b
+ 1966 01ae 05       		.uleb128 0x5
+ 1967 01af 00       		.byte	0
+ 1968 01b0 00       		.byte	0
+ 1969 01b1 00       		.byte	0
+ 1970              		.section	.debug_loc,"",%progbits
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 55
+
+
+ 1971              	.Ldebug_loc0:
+ 1972              	.LLST0:
+ 1973 0000 74000000 		.4byte	.LVL28
+ 1974 0004 77000000 		.4byte	.LVL29-1
+ 1975 0008 0100     		.2byte	0x1
+ 1976 000a 50       		.byte	0x50
+ 1977 000b 77000000 		.4byte	.LVL29-1
+ 1978 000f AE000000 		.4byte	.LVL37
+ 1979 0013 0100     		.2byte	0x1
+ 1980 0015 55       		.byte	0x55
+ 1981 0016 00000000 		.4byte	0
+ 1982 001a 00000000 		.4byte	0
+ 1983              	.LLST1:
+ 1984 001e 7A000000 		.4byte	.LVL30
+ 1985 0022 92000000 		.4byte	.LVL33
+ 1986 0026 0100     		.2byte	0x1
+ 1987 0028 50       		.byte	0x50
+ 1988 0029 92000000 		.4byte	.LVL33
+ 1989 002d 0A010000 		.4byte	.LVL47
+ 1990 0031 0100     		.2byte	0x1
+ 1991 0033 54       		.byte	0x54
+ 1992 0034 00000000 		.4byte	0
+ 1993 0038 00000000 		.4byte	0
+ 1994              	.LLST2:
+ 1995 003c 7A000000 		.4byte	.LVL30
+ 1996 0040 90000000 		.4byte	.LVL32
+ 1997 0044 0100     		.2byte	0x1
+ 1998 0046 55       		.byte	0x55
+ 1999 0047 00000000 		.4byte	0
+ 2000 004b 00000000 		.4byte	0
+ 2001              	.LLST3:
+ 2002 004f 88000000 		.4byte	.LVL31
+ 2003 0053 90000000 		.4byte	.LVL32
+ 2004 0057 0100     		.2byte	0x1
+ 2005 0059 51       		.byte	0x51
+ 2006 005a 00000000 		.4byte	0
+ 2007 005e 00000000 		.4byte	0
+ 2008              	.LLST4:
+ 2009 0062 90000000 		.4byte	.LVL32
+ 2010 0066 A2000000 		.4byte	.LVL35
+ 2011 006a 0100     		.2byte	0x1
+ 2012 006c 55       		.byte	0x55
+ 2013 006d 00000000 		.4byte	0
+ 2014 0071 00000000 		.4byte	0
+ 2015              	.LLST5:
+ 2016 0075 9C000000 		.4byte	.LVL34
+ 2017 0079 A2000000 		.4byte	.LVL35
+ 2018 007d 0100     		.2byte	0x1
+ 2019 007f 51       		.byte	0x51
+ 2020 0080 00000000 		.4byte	0
+ 2021 0084 00000000 		.4byte	0
+ 2022              	.LLST6:
+ 2023 0088 A2000000 		.4byte	.LVL35
+ 2024 008c AE000000 		.4byte	.LVL37
+ 2025 0090 0100     		.2byte	0x1
+ 2026 0092 55       		.byte	0x55
+ 2027 0093 00000000 		.4byte	0
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 56
+
+
+ 2028 0097 00000000 		.4byte	0
+ 2029              	.LLST7:
+ 2030 009b AC000000 		.4byte	.LVL36
+ 2031 009f B0000000 		.4byte	.LVL38
+ 2032 00a3 0100     		.2byte	0x1
+ 2033 00a5 50       		.byte	0x50
+ 2034 00a6 00000000 		.4byte	0
+ 2035 00aa 00000000 		.4byte	0
+ 2036              	.LLST8:
+ 2037 00ae C0000000 		.4byte	.LVL39
+ 2038 00b2 D2000000 		.4byte	.LVL41
+ 2039 00b6 0100     		.2byte	0x1
+ 2040 00b8 54       		.byte	0x54
+ 2041 00b9 00000000 		.4byte	0
+ 2042 00bd 00000000 		.4byte	0
+ 2043              	.LLST9:
+ 2044 00c1 CC000000 		.4byte	.LVL40
+ 2045 00c5 D2000000 		.4byte	.LVL41
+ 2046 00c9 0100     		.2byte	0x1
+ 2047 00cb 51       		.byte	0x51
+ 2048 00cc 00000000 		.4byte	0
+ 2049 00d0 00000000 		.4byte	0
+ 2050              	.LLST10:
+ 2051 00d4 D2000000 		.4byte	.LVL41
+ 2052 00d8 E4000000 		.4byte	.LVL43
+ 2053 00dc 0100     		.2byte	0x1
+ 2054 00de 54       		.byte	0x54
+ 2055 00df 00000000 		.4byte	0
+ 2056 00e3 00000000 		.4byte	0
+ 2057              	.LLST11:
+ 2058 00e7 DE000000 		.4byte	.LVL42
+ 2059 00eb E4000000 		.4byte	.LVL43
+ 2060 00ef 0100     		.2byte	0x1
+ 2061 00f1 50       		.byte	0x50
+ 2062 00f2 00000000 		.4byte	0
+ 2063 00f6 00000000 		.4byte	0
+ 2064              	.LLST12:
+ 2065 00fa E4000000 		.4byte	.LVL43
+ 2066 00fe 0A010000 		.4byte	.LVL47
+ 2067 0102 0100     		.2byte	0x1
+ 2068 0104 54       		.byte	0x54
+ 2069 0105 00000000 		.4byte	0
+ 2070 0109 00000000 		.4byte	0
+ 2071              	.LLST13:
+ 2072 010d F2000000 		.4byte	.LVL44
+ 2073 0111 FC000000 		.4byte	.LVL45
+ 2074 0115 0100     		.2byte	0x1
+ 2075 0117 51       		.byte	0x51
+ 2076 0118 FC000000 		.4byte	.LVL45
+ 2077 011c 0C010000 		.4byte	.LVL48
+ 2078 0120 0100     		.2byte	0x1
+ 2079 0122 50       		.byte	0x50
+ 2080 0123 00000000 		.4byte	0
+ 2081 0127 00000000 		.4byte	0
+ 2082              		.section	.debug_aranges,"",%progbits
+ 2083 0000 34000000 		.4byte	0x34
+ 2084 0004 0200     		.2byte	0x2
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 57
+
+
+ 2085 0006 00000000 		.4byte	.Ldebug_info0
+ 2086 000a 04       		.byte	0x4
+ 2087 000b 00       		.byte	0
+ 2088 000c 0000     		.2byte	0
+ 2089 000e 0000     		.2byte	0
+ 2090 0010 00000000 		.4byte	.LFB64
+ 2091 0014 44000000 		.4byte	.LFE64-.LFB64
+ 2092 0018 00000000 		.4byte	.LFB65
+ 2093 001c 2C000000 		.4byte	.LFE65-.LFB65
+ 2094 0020 00000000 		.4byte	.LFB66
+ 2095 0024 20000000 		.4byte	.LFE66-.LFB66
+ 2096 0028 00000000 		.4byte	.LFB63
+ 2097 002c 90010000 		.4byte	.LFE63-.LFB63
+ 2098 0030 00000000 		.4byte	0
+ 2099 0034 00000000 		.4byte	0
+ 2100              		.section	.debug_ranges,"",%progbits
+ 2101              	.Ldebug_ranges0:
+ 2102 0000 00000000 		.4byte	.LFB64
+ 2103 0004 44000000 		.4byte	.LFE64
+ 2104 0008 00000000 		.4byte	.LFB65
+ 2105 000c 2C000000 		.4byte	.LFE65
+ 2106 0010 00000000 		.4byte	.LFB66
+ 2107 0014 20000000 		.4byte	.LFE66
+ 2108 0018 00000000 		.4byte	.LFB63
+ 2109 001c 90010000 		.4byte	.LFE63
+ 2110 0020 00000000 		.4byte	0
+ 2111 0024 00000000 		.4byte	0
+ 2112              		.section	.debug_line,"",%progbits
+ 2113              	.Ldebug_line0:
+ 2114 0000 B0010000 		.section	.debug_str,"MS",%progbits,1
+ 2114      02000C01 
+ 2114      00000201 
+ 2114      FB0E0D00 
+ 2114      01010101 
+ 2115              	.LASF45:
+ 2116 0000 43795379 		.ascii	"CySysWdtEnable\000"
+ 2116      73576474 
+ 2116      456E6162 
+ 2116      6C6500
+ 2117              	.LASF53:
+ 2118 000f 4C45445F 		.ascii	"LED_Alarm_Write\000"
+ 2118      416C6172 
+ 2118      6D5F5772 
+ 2118      69746500 
+ 2119              	.LASF61:
+ 2120 001f 5254435F 		.ascii	"RTC_SetAlarmMask\000"
+ 2120      53657441 
+ 2120      6C61726D 
+ 2120      4D61736B 
+ 2120      00
+ 2121              	.LASF16:
+ 2122 0030 43595F53 		.ascii	"CY_SYS_TIMER_INTERRUPT\000"
+ 2122      59535F54 
+ 2122      494D4552 
+ 2122      5F494E54 
+ 2122      45525255 
+ 2123              	.LASF63:
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 58
+
+
+ 2124 0047 5254435F 		.ascii	"RTC_SetPeriod\000"
+ 2124      53657450 
+ 2124      6572696F 
+ 2124      6400
+ 2125              	.LASF2:
+ 2126 0055 73686F72 		.ascii	"short int\000"
+ 2126      7420696E 
+ 2126      7400
+ 2127              	.LASF72:
+ 2128 005f 443A5C4D 		.ascii	"D:\\MyProjects\\Cypress\\RTC_P4_WDT_Example01\\RTC_"
+ 2128      7950726F 
+ 2128      6A656374 
+ 2128      735C4379 
+ 2128      70726573 
+ 2129 008e 50345F57 		.ascii	"P4_WDT_Example01.cydsn\000"
+ 2129      44545F45 
+ 2129      78616D70 
+ 2129      6C653031 
+ 2129      2E637964 
+ 2130              	.LASF18:
+ 2131 00a5 73697A65 		.ascii	"sizetype\000"
+ 2131      74797065 
+ 2131      00
+ 2132              	.LASF27:
+ 2133 00ae 5254435F 		.ascii	"RTC_GetMonth\000"
+ 2133      4765744D 
+ 2133      6F6E7468 
+ 2133      00
+ 2134              	.LASF37:
+ 2135 00bb 5254435F 		.ascii	"RTC_daysBeforeMonthTbl\000"
+ 2135      64617973 
+ 2135      4265666F 
+ 2135      72654D6F 
+ 2135      6E746854 
+ 2136              	.LASF65:
+ 2137 00d2 5254435F 		.ascii	"RTC_GetTime\000"
+ 2137      47657454 
+ 2137      696D6500 
+ 2138              	.LASF21:
+ 2139 00de 6461794F 		.ascii	"dayOfWeek\000"
+ 2139      66576565 
+ 2139      6B00
+ 2140              	.LASF52:
+ 2141 00e8 4C45445F 		.ascii	"LED_Alarm_Read\000"
+ 2141      416C6172 
+ 2141      6D5F5265 
+ 2141      616400
+ 2142              	.LASF28:
+ 2143 00f7 5254435F 		.ascii	"RTC_GetSecond\000"
+ 2143      47657453 
+ 2143      65636F6E 
+ 2143      6400
+ 2144              	.LASF68:
+ 2145 0105 55415254 		.ascii	"UART_PutString\000"
+ 2145      5F507574 
+ 2145      53747269 
+ 2145      6E6700
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 59
+
+
+ 2146              	.LASF70:
+ 2147 0114 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2147      43313120 
+ 2147      352E342E 
+ 2147      31203230 
+ 2147      31363036 
+ 2148 0147 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m0 -mthumb -g -O"
+ 2148      20726576 
+ 2148      6973696F 
+ 2148      6E203233 
+ 2148      37373135 
+ 2149 017a 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 2149      66756E63 
+ 2149      74696F6E 
+ 2149      2D736563 
+ 2149      74696F6E 
+ 2150              	.LASF39:
+ 2151 01a2 616C6172 		.ascii	"alarmFlag\000"
+ 2151      6D466C61 
+ 2151      6700
+ 2152              	.LASF9:
+ 2153 01ac 75696E74 		.ascii	"uint8\000"
+ 2153      3800
+ 2154              	.LASF43:
+ 2155 01b2 43795379 		.ascii	"CySysWdtSetClearOnMatch\000"
+ 2155      73576474 
+ 2155      53657443 
+ 2155      6C656172 
+ 2155      4F6E4D61 
+ 2156              	.LASF49:
+ 2157 01ca 4C45445F 		.ascii	"LED_WdtIsr_Read\000"
+ 2157      57647449 
+ 2157      73725F52 
+ 2157      65616400 
+ 2158              	.LASF12:
+ 2159 01da 666C6F61 		.ascii	"float\000"
+ 2159      7400
+ 2160              	.LASF38:
+ 2161 01e0 616C6172 		.ascii	"alarmTimeDate\000"
+ 2161      6D54696D 
+ 2161      65446174 
+ 2161      6500
+ 2162              	.LASF6:
+ 2163 01ee 6C6F6E67 		.ascii	"long long int\000"
+ 2163      206C6F6E 
+ 2163      6720696E 
+ 2163      7400
+ 2164              	.LASF42:
+ 2165 01fc 43795379 		.ascii	"CySysWdtDisable\000"
+ 2165      73576474 
+ 2165      44697361 
+ 2165      626C6500 
+ 2166              	.LASF4:
+ 2167 020c 6C6F6E67 		.ascii	"long int\000"
+ 2167      20696E74 
+ 2167      00
+ 2168              	.LASF47:
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 60
+
+
+ 2169 0215 43795379 		.ascii	"CySysWdtEnableCounterIsr\000"
+ 2169      73576474 
+ 2169      456E6162 
+ 2169      6C65436F 
+ 2169      756E7465 
+ 2170              	.LASF41:
+ 2171 022e 43795379 		.ascii	"CySysClkSetLfclkSource\000"
+ 2171      73436C6B 
+ 2171      5365744C 
+ 2171      66636C6B 
+ 2171      536F7572 
+ 2172              	.LASF23:
+ 2173 0245 5254435F 		.ascii	"RTC_DATE_TIME\000"
+ 2173      44415445 
+ 2173      5F54494D 
+ 2173      4500
+ 2174              	.LASF60:
+ 2175 0253 5254435F 		.ascii	"RTC_SetDateAndTime\000"
+ 2175      53657444 
+ 2175      61746541 
+ 2175      6E645469 
+ 2175      6D6500
+ 2176              	.LASF29:
+ 2177 0266 696E7075 		.ascii	"inputTime\000"
+ 2177      7454696D 
+ 2177      6500
+ 2178              	.LASF17:
+ 2179 0270 6C6F6E67 		.ascii	"long double\000"
+ 2179      20646F75 
+ 2179      626C6500 
+ 2180              	.LASF31:
+ 2181 027c 5254435F 		.ascii	"RTC_GetHours\000"
+ 2181      47657448 
+ 2181      6F757273 
+ 2181      00
+ 2182              	.LASF1:
+ 2183 0289 756E7369 		.ascii	"unsigned char\000"
+ 2183      676E6564 
+ 2183      20636861 
+ 2183      7200
+ 2184              	.LASF62:
+ 2185 0297 5254435F 		.ascii	"RTC_SetAlarmDateAndTime\000"
+ 2185      53657441 
+ 2185      6C61726D 
+ 2185      44617465 
+ 2185      416E6454 
+ 2186              	.LASF67:
+ 2187 02af 73707269 		.ascii	"sprintf\000"
+ 2187      6E746600 
+ 2188              	.LASF51:
+ 2189 02b7 5254435F 		.ascii	"RTC_Update\000"
+ 2189      55706461 
+ 2189      746500
+ 2190              	.LASF0:
+ 2191 02c2 7369676E 		.ascii	"signed char\000"
+ 2191      65642063 
+ 2191      68617200 
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 61
+
+
+ 2192              	.LASF48:
+ 2193 02ce 4C46434C 		.ascii	"LFCLK_Out_SetDriveMode\000"
+ 2193      4B5F4F75 
+ 2193      745F5365 
+ 2193      74447269 
+ 2193      76654D6F 
+ 2194              	.LASF7:
+ 2195 02e5 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2195      206C6F6E 
+ 2195      6720756E 
+ 2195      7369676E 
+ 2195      65642069 
+ 2196              	.LASF55:
+ 2197 02fc 43795379 		.ascii	"CySysClkWcoStart\000"
+ 2197      73436C6B 
+ 2197      57636F53 
+ 2197      74617274 
+ 2197      00
+ 2198              	.LASF8:
+ 2199 030d 756E7369 		.ascii	"unsigned int\000"
+ 2199      676E6564 
+ 2199      20696E74 
+ 2199      00
+ 2200              	.LASF56:
+ 2201 031a 43795379 		.ascii	"CySysWdtSetMode\000"
+ 2201      73576474 
+ 2201      5365744D 
+ 2201      6F646500 
+ 2202              	.LASF50:
+ 2203 032a 4C45445F 		.ascii	"LED_WdtIsr_Write\000"
+ 2203      57647449 
+ 2203      73725F57 
+ 2203      72697465 
+ 2203      00
+ 2204              	.LASF54:
+ 2205 033b 5254435F 		.ascii	"RTC_ClearAlarmStatus\000"
+ 2205      436C6561 
+ 2205      72416C61 
+ 2205      726D5374 
+ 2205      61747573 
+ 2206              	.LASF19:
+ 2207 0350 74696D65 		.ascii	"time\000"
+ 2207      00
+ 2208              	.LASF3:
+ 2209 0355 73686F72 		.ascii	"short unsigned int\000"
+ 2209      7420756E 
+ 2209      7369676E 
+ 2209      65642069 
+ 2209      6E7400
+ 2210              	.LASF22:
+ 2211 0368 73746174 		.ascii	"status\000"
+ 2211      757300
+ 2212              	.LASF14:
+ 2213 036f 63686172 		.ascii	"char\000"
+ 2213      00
+ 2214              	.LASF73:
+ 2215 0374 6D61696E 		.ascii	"main\000"
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 62
+
+
+ 2215      00
+ 2216              	.LASF69:
+ 2217 0379 43795379 		.ascii	"CySysPmDeepSleep\000"
+ 2217      73506D44 
+ 2217      65657053 
+ 2217      6C656570 
+ 2217      00
+ 2218              	.LASF30:
+ 2219 038a 5254435F 		.ascii	"RTC_GetMinutes\000"
+ 2219      4765744D 
+ 2219      696E7574 
+ 2219      657300
+ 2220              	.LASF36:
+ 2221 0399 64617465 		.ascii	"dateBuffer\000"
+ 2221      42756666 
+ 2221      657200
+ 2222              	.LASF64:
+ 2223 03a4 5254435F 		.ascii	"RTC_SetAlarmHandler\000"
+ 2223      53657441 
+ 2223      6C61726D 
+ 2223      48616E64 
+ 2223      6C657200 
+ 2224              	.LASF10:
+ 2225 03b8 75696E74 		.ascii	"uint16\000"
+ 2225      313600
+ 2226              	.LASF20:
+ 2227 03bf 64617465 		.ascii	"date\000"
+ 2227      00
+ 2228              	.LASF25:
+ 2229 03c4 5254435F 		.ascii	"RTC_GetDay\000"
+ 2229      47657444 
+ 2229      617900
+ 2230              	.LASF71:
+ 2231 03cf 6D61696E 		.ascii	"main.c\000"
+ 2231      2E6300
+ 2232              	.LASF5:
+ 2233 03d6 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2233      20756E73 
+ 2233      69676E65 
+ 2233      6420696E 
+ 2233      7400
+ 2234              	.LASF24:
+ 2235 03e8 5254435F 		.ascii	"RTC_GetYear\000"
+ 2235      47657459 
+ 2235      65617200 
+ 2236              	.LASF11:
+ 2237 03f4 75696E74 		.ascii	"uint32\000"
+ 2237      333200
+ 2238              	.LASF40:
+ 2239 03fb 75693130 		.ascii	"ui100mS\000"
+ 2239      306D5300 
+ 2240              	.LASF66:
+ 2241 0403 5254435F 		.ascii	"RTC_GetDate\000"
+ 2241      47657444 
+ 2241      61746500 
+ 2242              	.LASF58:
+ 2243 040f 43795379 		.ascii	"CySysTimerDelay\000"
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 63
+
+
+ 2243      7354696D 
+ 2243      65724465 
+ 2243      6C617900 
+ 2244              	.LASF34:
+ 2245 041f 416C6172 		.ascii	"AlarmIsrHandler\000"
+ 2245      6D497372 
+ 2245      48616E64 
+ 2245      6C657200 
+ 2246              	.LASF32:
+ 2247 042f 456E6162 		.ascii	"EnableRtcOperation\000"
+ 2247      6C655274 
+ 2247      634F7065 
+ 2247      72617469 
+ 2247      6F6E00
+ 2248              	.LASF46:
+ 2249 0442 43795379 		.ascii	"CySysWdtSetInterruptCallback\000"
+ 2249      73576474 
+ 2249      53657449 
+ 2249      6E746572 
+ 2249      72757074 
+ 2250              	.LASF57:
+ 2251 045f 43795379 		.ascii	"CySysWdtDisableCounterIsr\000"
+ 2251      73576474 
+ 2251      44697361 
+ 2251      626C6543 
+ 2251      6F756E74 
+ 2252              	.LASF26:
+ 2253 0479 72657456 		.ascii	"retVal\000"
+ 2253      616C00
+ 2254              	.LASF13:
+ 2255 0480 646F7562 		.ascii	"double\000"
+ 2255      6C6500
+ 2256              	.LASF33:
+ 2257 0487 55706461 		.ascii	"UpdateTimeIsrHandler\000"
+ 2257      74655469 
+ 2257      6D654973 
+ 2257      7248616E 
+ 2257      646C6572 
+ 2258              	.LASF44:
+ 2259 049c 43795379 		.ascii	"CySysWdtSetMatch\000"
+ 2259      73576474 
+ 2259      5365744D 
+ 2259      61746368 
+ 2259      00
+ 2260              	.LASF59:
+ 2261 04ad 5254435F 		.ascii	"RTC_Start\000"
+ 2261      53746172 
+ 2261      7400
+ 2262              	.LASF35:
+ 2263 04b7 74696D65 		.ascii	"timeBuffer\000"
+ 2263      42756666 
+ 2263      657200
+ 2264              	.LASF15:
+ 2265 04c2 43595F53 		.ascii	"CY_SYS_TIMER_WAIT\000"
+ 2265      59535F54 
+ 2265      494D4552 
+ 2265      5F574149 
+ARM GAS  C:\Users\jimmy\AppData\Local\Temp\ccFysI3U.s 			page 64
+
+
+ 2265      5400
+ 2266              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

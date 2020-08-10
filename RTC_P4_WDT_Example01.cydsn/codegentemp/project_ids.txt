@@ -1,0 +1,6 @@
+D:\MyProjects\Cypress\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\RTC_P4_WDT_Example01.cyprj|c5ce5c6f-1eb0-475c-a994-40ab0daa2648
+C:\Program Files (x86)\Cypress\PSoC Creator\4.3\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|84a9e693-60df-4016-8fb5-93b7fb2e2395
+C:\Users\jimmy\Documents\PSoC Creator\4.3\Downloads ( 4.3).cylib\Downloads ( 4.3).cyprj|f23ff8c2-8767-480d-9b7e-9016d85d1210
+C:\Program Files (x86)\Cypress\PSoC Creator\4.3\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|5f4d7bfb-b60d-4b99-9ac1-a46b54438798
+C:\Program Files (x86)\Cypress\PSoC Creator\4.3\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|4ed8f240-b71e-4204-a0d1-dfc5bf33078a
+C:\Program Files (x86)\Cypress\PSoC Creator\4.3\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|ee6b14db-0a29-480b-9905-ed1847eb02e0

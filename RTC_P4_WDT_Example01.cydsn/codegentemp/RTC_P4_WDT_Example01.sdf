@@ -1,0 +1,25 @@
+(DELAYFILE
+ (SDFVERSION "IEEE 1497 4.0")
+ (DATE "2020-08-10T08:22:09Z")
+ (DESIGN "RTC_P4_WDT_Example01")
+ (VENDOR "Cypress Semiconductor")
+ (PROGRAM "PSoC Creator")
+ (VERSION " 4.3")
+ (DIVIDER .)
+ (TIMESCALE 1 ns)
+ (CELL
+  (CELLTYPE "RTC_P4_WDT_Example01")
+  (INSTANCE *)
+  (DELAY
+   (ABSOLUTE
+    (INTERCONNECT ClockBlock.lfclk LFCLK_Out\(0\).pin_input (6.258:6.258:6.258))
+    (INTERCONNECT LFCLK_Out\(0\).pad_out LFCLK_Out\(0\).pad_in (0.000:0.000:0.000))
+    (INTERCONNECT LED_Alarm\(0\)_PAD LED_Alarm\(0\).pad_in (0.000:0.000:0.000))
+    (INTERCONNECT LED_WdtIsr\(0\)_PAD LED_WdtIsr\(0\).pad_in (0.000:0.000:0.000))
+    (INTERCONNECT \\UART\:tx\(0\)_PAD\\ \\UART\:tx\(0\)\\.pad_in (0.000:0.000:0.000))
+    (INTERCONNECT LFCLK_Out\(0\).pad_out LFCLK_Out\(0\)_PAD (0.000:0.000:0.000))
+    (INTERCONNECT LFCLK_Out\(0\)_PAD LFCLK_Out\(0\).pad_in (0.000:0.000:0.000))
+   )
+  )
+ )
+)
