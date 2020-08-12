@@ -1,6 +1,6 @@
 -- Project:   RTC_P4_WDT_Example01
--- Generated: 08/10/2020 16:22:08
--- PSoC Creator  4.3
+-- Generated: 08/12/2020 15:57:13
+-- PSoC Creator  4.2
 
 ENTITY RTC_P4_WDT_Example01 IS
     PORT(
@@ -35,6 +35,14 @@ ARCHITECTURE __DEFAULT__ OF RTC_P4_WDT_Example01 IS
     SIGNAL LED_Alarm(0)__PA : bit;
     SIGNAL LED_WdtIsr(0)__PA : bit;
     SIGNAL LFCLK_Out(0)__PA : bit;
+    SIGNAL Net_201 : bit;
+    SIGNAL Net_202 : bit;
+    SIGNAL Net_203 : bit;
+    SIGNAL Net_204 : bit;
+    SIGNAL Net_205 : bit;
+    SIGNAL Net_206_ff7 : bit;
+    ATTRIBUTE global_signal OF Net_206_ff7 : SIGNAL IS true;
+    SIGNAL Net_385 : bit;
     SIGNAL \\\UART:tx(0)\\__PA\ : bit;
     SIGNAL __ONE__ : bit;
     ATTRIBUTE POWER OF __ONE__ : SIGNAL IS true;
@@ -52,6 +60,11 @@ ARCHITECTURE __DEFAULT__ OF RTC_P4_WDT_Example01 IS
     ATTRIBUTE lib_model OF \UART:tx(0)\ : LABEL IS "iocell3";
     ATTRIBUTE Location OF \UART:tx(0)\ : LABEL IS "P3[5]";
     ATTRIBUTE lib_model OF LFCLK_Out(0) : LABEL IS "iocell4";
+    COMPONENT interrupt
+        PORT (
+            interrupt : IN std_ulogic;
+            clock : IN std_ulogic);
+    END COMPONENT;
     COMPONENT iocell
         PORT (
             oe : IN std_ulogic;
@@ -206,6 +219,21 @@ ARCHITECTURE __DEFAULT__ OF RTC_P4_WDT_Example01 IS
             gen_clk_out_6 : OUT std_ulogic;
             gen_clk_out_7 : OUT std_ulogic);
     END COMPONENT;
+    COMPONENT m0s8tcpwmcell
+        PORT (
+            clock : IN std_ulogic;
+            capture : IN std_ulogic;
+            count : IN std_ulogic;
+            reload : IN std_ulogic;
+            stop : IN std_ulogic;
+            start : IN std_ulogic;
+            tr_underflow : OUT std_ulogic;
+            tr_overflow : OUT std_ulogic;
+            tr_compare_match : OUT std_ulogic;
+            line : OUT std_ulogic;
+            line_compl : OUT std_ulogic;
+            interrupt : OUT std_ulogic);
+    END COMPONENT;
 BEGIN
 
     ClockGenBlock:m0s8clockgenblockcell;
@@ -220,7 +248,8 @@ BEGIN
             ilo => ClockBlock_ILO,
             lfclk => ClockBlock_LFCLK,
             wco => ClockBlock_WCO,
-            dsi_in_0 => ClockBlock_Routed1);
+            dsi_in_0 => ClockBlock_Routed1,
+            ff_div_7 => Net_206_ff7);
 
     LED_Alarm:logicalport
         GENERIC MAP(
@@ -583,5 +612,30 @@ BEGIN
             out_clock => open,
             out_clock_en => '1',
             out_reset => '0');
+
+    \Timer1:cy_m0s8_tcpwm_1\:m0s8tcpwmcell
+        GENERIC MAP(
+            cy_registers => "")
+        PORT MAP(
+            clock => Net_206_ff7,
+            capture => '0',
+            count => '1',
+            reload => '0',
+            stop => '0',
+            start => '0',
+            tr_underflow => Net_202,
+            tr_overflow => Net_201,
+            tr_compare_match => Net_203,
+            line => Net_204,
+            line_compl => Net_205,
+            interrupt => Net_385);
+
+    isrTimer1:interrupt
+        GENERIC MAP(
+            int_type => "10",
+            is_nmi => 0)
+        PORT MAP(
+            interrupt => Net_385,
+            clock => ClockBlock_HFCLK);
 
 END __DEFAULT__;

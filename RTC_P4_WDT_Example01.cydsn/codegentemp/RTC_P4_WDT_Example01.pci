@@ -1,5 +1,5 @@
 # RTC_P4_WDT_Example01
-# 2020-08-10 08:22:08Z
+# 2020-08-12 07:57:13Z
 
 # IO_6@[IOP=(0)][IoId=(6)] is reserved: SWDDebugEnabled
 dont_use_io iocell 0 6

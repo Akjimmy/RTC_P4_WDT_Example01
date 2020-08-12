@@ -69,7 +69,13 @@ CY_ISR_PROTO(EnableRtcOperation);
 CY_ISR_PROTO(UpdateTimeIsrHandler);
 CY_ISR_PROTO(AlarmIsrHandler);
 
+CY_ISR_PROTO(Time1_ISR_Handler);
+
+
 uint32 ui100mS=0;
+uint8   byUpdateTime=0;
+
+#define _TEST_TIMER_
 
 /*******************************************************************************
 * Function Name: main
@@ -143,9 +149,29 @@ int main()
     /* Set function AlarmIsrHandler to be called when alarm triggers */
     RTC_SetAlarmHandler(AlarmIsrHandler);
     
+    isrTimer1_StartEx(Time1_ISR_Handler);
+    Timer1_Start();
+    uint32 intmask;
+    uint32 intSource;\
+    
+    intmask=Timer1_GetInterruptSourceMasked();
+    intSource=Timer1_GetInterruptSource();
+    
+    
+    if(intmask==Timer1_INTR_MASK_TC ||intSource==Timer1_INTR_MASK_TC)
+    {
+        CyDelay(100);    
+    }
+    if(intmask==Timer1_INTR_MASK_CC_MATCH || intSource==Timer1_INTR_MASK_CC_MATCH)
+    {
+        CyDelay(100);    
+    }
+    
     while(1)
     {
-
+        if(byUpdateTime)
+        {
+        byUpdateTime=0;
         /* Get Date and Time from RTC */
         time = RTC_GetTime();
         date = RTC_GetDate();
@@ -169,9 +195,17 @@ int main()
         }
 
         UART_PutString("\r");
-
+        }
+        
         /* Switch to Sleep Mode */
-        CySysPmDeepSleep();
+        #ifndef _TEST_TIMER_ // timer can not wakeup CPU from deepsleep
+            CySysPmDeepSleep();           
+        #endif
+        
+        #ifdef _TEST_TIMER_
+            CySysPmSleep();           
+        #endif    
+        
     }
 }
 
@@ -232,8 +266,9 @@ void UpdateTimeIsrHandler(void)
     ui100mS++;
     if(ui100mS>9)
         ui100mS=0;
-    LED_WdtIsr_Write((uint8)~(LED_WdtIsr_Read()));
+    //LED_WdtIsr_Write((uint8)~(LED_WdtIsr_Read()));
     RTC_Update();
+    byUpdateTime=1;
 }
 
 
@@ -255,10 +290,72 @@ void AlarmIsrHandler(void)
     alarmFlag = 1u;
 
     /* Toggle pin state */
-     LED_Alarm_Write((uint8)~(LED_Alarm_Read()));
+    // LED_Alarm_Write((uint8)~(LED_Alarm_Read()));
 
     /* Clear interrupts state */
     RTC_ClearAlarmStatus();
 }
+
+/*******************************************************************************
+* Function Name: Time1_ISR_Handle
+********************************************************************************
+* Summary:
+*  The interrupt handler for Alarm interrupts. Toggles the LED_WdtInt pin.
+*
+* Parameters:
+*  None
+*
+* Return:
+*  None
+*
+*******************************************************************************/
+CY_ISR(Time1_ISR_Handler)
+{
+    //
+    uint32  intmask;
+    uint32  intSource;
+    uint32  Timer1Count;
+    
+    isrTimer1_ClearPending();
+    
+    intSource=Timer1_GetInterruptSource();
+    intmask=Timer1_GetInterruptSourceMasked();
+    
+    
+     if(intmask==Timer1_INTR_MASK_TC ||intSource==Timer1_INTR_MASK_TC)
+    {
+        CyDelay(100);    
+    }
+    if(intmask==Timer1_INTR_MASK_CC_MATCH || intSource==Timer1_INTR_MASK_CC_MATCH)
+    {
+        CyDelay(100);    
+    }
+    
+    
+    Timer1_ClearInterrupt(intmask);
+    Timer1_ClearInterrupt(intSource);
+    //LED_Alarm_Write((uint8)~(LED_Alarm_Read()));
+    
+    
+    if(intmask==Timer1_INTR_MASK_TC)
+    {
+        //Timer1_ClearInterrupt(Timer1_INTR_MASK_TC);
+        //Timer1Count=Timer1_ReadCounter();
+        //LED_Alarm_Write(0);
+        LED_Alarm_Write((uint8)~(LED_Alarm_Read()));//Red LED
+        //LED_WdtIsr_Write(1);
+    }
+    if(intmask==Timer1_INTR_MASK_CC_MATCH)
+    {
+       // Timer1_ClearInterrupt(Timer1_INTR_MASK_CC_MATCH);
+        //Timer1Count=Timer1_ReadCounter();
+        //LED_Alarm_Write(1);
+        //LED_WdtIsr_Write(0);
+        LED_WdtIsr_Write((uint8)~(LED_WdtIsr_Read()));//Blue LED
+    }
+    
+   
+}   
+
 
 /* [] END OF FILE */

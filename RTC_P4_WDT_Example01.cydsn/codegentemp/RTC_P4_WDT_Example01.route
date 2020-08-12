@@ -1,3 +1,8 @@
+net ClockBlock_HFCLK
+	term   ":m0s8clockblockcell.hfclk"
+	switch ":m0s8clockblockcell.hfclk==>:interrupt_17.clock"
+	term   ":interrupt_17.clock"
+end ClockBlock_HFCLK
 net ClockBlock_LFCLK
 	term   ":m0s8clockblockcell.lfclk"
 	switch ":m0s8clockblockcell.lfclk==>Stub-:dsiswitch_top@[DSI=(0,1)][side=top]:dsihc_top:v37+:dsiswitch_top@[DSI=(0,1)][side=top]:dsihc_top:v39"
@@ -14,3 +19,9 @@ net ClockBlock_LFCLK
 	switch ":ioport0:hsiom_out4.hsiom4_out==>:ioport0:pin4.pin_input"
 	term   ":ioport0:pin4.pin_input"
 end ClockBlock_LFCLK
+net Net_385
+	term   ":m0s8tcpwmcell_0.interrupt"
+	switch ":m0s8tcpwmcell_0.interrupt==>:interrupt_idmux_17.in_0"
+	switch ":interrupt_idmux_17.interrupt_idmux_17__out==>:interrupt_17.interrupt"
+	term   ":interrupt_17.interrupt"
+end Net_385

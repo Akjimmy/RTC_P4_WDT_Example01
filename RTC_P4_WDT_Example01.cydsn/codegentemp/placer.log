@@ -4,9 +4,9 @@
 
 #Version:            1.1
 
-#Build Date:         Sep  9 2019 11:47:43
+#Build Date:         Dec  5 2017 15:35:27
 
-#File Generated:     Aug 10 2020 16:22:08
+#File Generated:     Aug 12 2020 15:57:13
 
 #Purpose:            
 
@@ -14,16 +14,16 @@
 
 #***************************************************************************
 
-Executing : C:\Program Files (x86)\Cypress\PSoC Creator\4.3\PSoC Creator\bin/sjplacer.exe --proj-name RTC_P4_WDT_Example01 --netlist-vh2 RTC_P4_WDT_Example01_p.vh2 --arch p4_udb2x2 --arch-file C:\Program Files (x86)\Cypress\PSoC Creator\4.3\PSoC Creator\dev\arch/udbdsi_2x2_04.cydata --ip-file C:\Program Files (x86)\Cypress\PSoC Creator\4.3\PSoC Creator\dev\psoc4/3/256dma/ip_blocks.cydata --rrg-file C:\Program Files (x86)\Cypress\PSoC Creator\4.3\PSoC Creator\dev\psoc4/3/256dma/route_arch-rrg.cydata --irq-file C:\Program Files (x86)\Cypress\PSoC Creator\4.3\PSoC Creator\dev\psoc4/3/256dma/irqconn.cydata --drq-file C:\Program Files (x86)\Cypress\PSoC Creator\4.3\PSoC Creator\dev\psoc4/3/256dma/triggerconn.cydata --dsi-conn-file C:\Program Files (x86)\Cypress\PSoC Creator\4.3\PSoC Creator\dev\psoc4/3/256dma/dsiconn.cydata --pins-file pins_30-SMT_ER.xml --lib-file RTC_P4_WDT_Example01_p.lib --sdc-file RTC_P4_WDT_Example01.sdc --io-pcf RTC_P4_WDT_Example01.pci --outdir .
+Executing : C:\Program Files\Cypress\PSoC Creator\4.2\PSoC Creator\bin/sjplacer.exe --proj-name RTC_P4_WDT_Example01 --netlist-vh2 RTC_P4_WDT_Example01_p.vh2 --arch p4_udb2x2 --arch-file C:\Program Files\Cypress\PSoC Creator\4.2\PSoC Creator\dev\arch/udbdsi_2x2_04.cydata --ip-file C:\Program Files\Cypress\PSoC Creator\4.2\PSoC Creator\dev\psoc4/3/256dma/ip_blocks.cydata --rrg-file C:\Program Files\Cypress\PSoC Creator\4.2\PSoC Creator\dev\psoc4/3/256dma/route_arch-rrg.cydata --irq-file C:\Program Files\Cypress\PSoC Creator\4.2\PSoC Creator\dev\psoc4/3/256dma/irqconn.cydata --drq-file C:\Program Files\Cypress\PSoC Creator\4.2\PSoC Creator\dev\psoc4/3/256dma/triggerconn.cydata --dsi-conn-file C:\Program Files\Cypress\PSoC Creator\4.2\PSoC Creator\dev\psoc4/3/256dma/dsiconn.cydata --pins-file pins_30-SMT_ER.xml --lib-file RTC_P4_WDT_Example01_p.lib --sdc-file RTC_P4_WDT_Example01.sdc --io-pcf RTC_P4_WDT_Example01.pci --outdir .
 
 		Softjin Techologies Placer, Version 1.1
 
-Build Date : Sep  9 2019	11:45:12
+Build Date : Dec  5 2017	15:33:41
 
 D2004: Option and Settings Summary
 =============================================================
 Netlist vh2 file          - RTC_P4_WDT_Example01_p.vh2
-Architecture file         - C:\Program Files (x86)\Cypress\PSoC Creator\4.3\PSoC Creator\dev\arch/udbdsi_2x2_04.cydata
+Architecture file         - C:\Program Files\Cypress\PSoC Creator\4.2\PSoC Creator\dev\arch/udbdsi_2x2_04.cydata
 Package                   - 
 Defparam file             - 
 SDC file                  - RTC_P4_WDT_Example01.sdc
@@ -34,7 +34,7 @@ IO Placement file         - RTC_P4_WDT_Example01.pci
 D2050: Starting reading inputs for placer
 =============================================================
 D2065: Reading netlist file : "RTC_P4_WDT_Example01_p.vh2"
-D2065: Reading arch file : "C:\Program Files (x86)\Cypress\PSoC Creator\4.3\PSoC Creator\dev\arch/udbdsi_2x2_04.cydata"
+D2065: Reading arch file : "C:\Program Files\Cypress\PSoC Creator\4.2\PSoC Creator\dev\arch/udbdsi_2x2_04.cydata"
 D2051: Reading of inputs for placer completed successfully
 
 D2053: Starting placement of the design
@@ -87,5 +87,5 @@ D2088: Phase 8, elapsed time : 0.0 (sec)
 
 D2054: Placement of the design completed successfully
 
-I2076: Total run-time: 0.3 sec.
+I2076: Total run-time: 0.2 sec.
 

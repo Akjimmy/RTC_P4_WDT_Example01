@@ -1,5 +1,5 @@
 # RTC_P4_WDT_Example01
-# 2020-08-10 08:22:08Z
+# 2020-08-12 07:57:14Z
 
 # IO_6@[IOP=(0)][IoId=(6)] is reserved: SWDDebugEnabled
 dont_use_io iocell 0 6
@@ -23,3 +23,5 @@ set_io "LED_Alarm(0)" iocell 3 6
 set_io "LED_WdtIsr(0)" iocell 3 7
 set_io "\UART:tx(0)\" iocell 3 5
 set_io "LFCLK_Out(0)" iocell 0 4
+set_location "\Timer1:cy_m0s8_tcpwm_1\" m0s8tcpwmcell -1 -1 0
+set_location "isrTimer1" interrupt -1 -1 17
