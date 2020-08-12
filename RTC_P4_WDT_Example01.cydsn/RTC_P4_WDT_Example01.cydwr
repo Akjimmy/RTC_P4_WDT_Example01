@@ -14,6 +14,7 @@
     <Group key="Pin">
       <Data key="2d995e91-1666-40ac-9def-5d86ed97599b/52f31aa9-2f0a-497d-9a1f-1424095e13e6" value="UART_tx" />
       <Data key="3dba336a-f6a5-43fb-aed3-de1e0b7bf362" value="LED_WdtIsr" />
+      <Data key="8d318d8b-cf7b-4b6b-b02c-ab1c5c49d0ba" value="Pin_1" />
       <Data key="a6876647-e3e4-4774-aabf-49f86af59d76" value="LED_Blue" />
       <Data key="d4c1f071-ffa7-444d-a4a5-96c7f43ded8c" value="LED_WdtReset" />
       <Data key="e851a3b9-efb8-48be-bbb8-b303b216c393" value="LFCLK_Out" />
@@ -1294,6 +1295,11 @@
     <Group key="3dba336a-f6a5-43fb-aed3-de1e0b7bf362">
       <Group key="0">
         <Data key="Port Format" value="3,7" />
+      </Group>
+    </Group>
+    <Group key="8d318d8b-cf7b-4b6b-b02c-ab1c5c49d0ba">
+      <Group key="0">
+        <Data key="Port Format" value="1,0" />
       </Group>
     </Group>
     <Group key="a6876647-e3e4-4774-aabf-49f86af59d76">

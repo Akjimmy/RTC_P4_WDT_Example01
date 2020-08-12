@@ -40,6 +40,10 @@
   <file name="C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\codegentemp\Clock_2.h" value="HEADER;;;;;Clock_2" />
   <file name="C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\codegentemp\isrTimer1.c" value="SOURCE_C;CortexM0;;;;isrTimer1" />
   <file name="C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\codegentemp\isrTimer1.h" value="HEADER;;;;;isrTimer1" />
+  <file name="C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\codegentemp\Pin_1.c" value="SOURCE_C;CortexM0;;;;Pin_1" />
+  <file name="C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\codegentemp\Pin_1.h" value="HEADER;;;;;Pin_1" />
+  <file name="C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\codegentemp\Pin_1_aliases.h" value="HEADER;;;;;Pin_1" />
+  <file name="C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\codegentemp\Pin_1_PM.c" value="SOURCE_C;CortexM0;;;;Pin_1" />
   <file name="C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\codegentemp\cy_em_eeprom.c" value="SOURCE_C;CortexM0;;;;Em_EEPROM_Dynamic" />
   <file name="C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\codegentemp\cy_em_eeprom.h" value="HEADER;;;;;Em_EEPROM_Dynamic" />
   <file name="C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\codegentemp\cm0gcc.ld" value="LINKER_SCRIPT;;;b98f980c-3bd1-4fc7-a887-c56a20a46fdd;;cy_boot" />

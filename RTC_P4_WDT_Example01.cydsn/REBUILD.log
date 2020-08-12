@@ -1,4 +1,4 @@
---------------- Rebuild Started: 08/12/2020 15:57:09 Project: RTC_P4_WDT_Example01, Configuration: ARM GCC 5.4-2016-q2-update Debug ---------------
+--------------- Rebuild Started: 08/12/2020 17:46:06 Project: RTC_P4_WDT_Example01, Configuration: ARM GCC 5.4-2016-q2-update Debug ---------------
 Deleting file ".\CortexM0\ARM_GCC_541\Debug\main.o"
 Deleting file ".\CortexM0\ARM_GCC_541\Debug\cyfitter_cfg.o"
 Deleting file ".\CortexM0\ARM_GCC_541\Debug\cymetadata.o"
@@ -24,6 +24,8 @@ Deleting file ".\CortexM0\ARM_GCC_541\Debug\Clock_2.o"
 Deleting file ".\CortexM0\ARM_GCC_541\Debug\Timer1.o"
 Deleting file ".\CortexM0\ARM_GCC_541\Debug\Timer1_PM.o"
 Deleting file ".\CortexM0\ARM_GCC_541\Debug\isrTimer1.o"
+Deleting file ".\CortexM0\ARM_GCC_541\Debug\Pin_1.o"
+Deleting file ".\CortexM0\ARM_GCC_541\Debug\Pin_1_PM.o"
 Deleting file ".\CortexM0\ARM_GCC_541\Debug\RTC_P4_WDT_Example01.hex"
 Deleting file ".\CortexM0\ARM_GCC_541\Debug\RTC_P4_WDT_Example01.elf"
 Deleting file ".\CortexM0\ARM_GCC_541\Debug\RTC_P4_WDT_Example01.map"
@@ -51,10 +53,16 @@ API Generation...
 Dependency Generation...
 Cleanup...
 arm-none-eabi-gcc.exe -mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=.\CortexM0\ARM_GCC_541\Debug/main.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og -c main.c -o .\CortexM0\ARM_GCC_541\Debug\main.o
-main.c: In function 'Time1_ISR_Handler':
-main.c:317:13: warning: unused variable 'Timer1Count' [-Wunused-variable]
-     uint32  Timer1Count;
-             ^
+main.c: In function 'main':
+main.c:110:12: warning: unused variable 'intSource' [-Wunused-variable]
+     uint32 intSource;
+            ^
+main.c:109:12: warning: unused variable 'intmask' [-Wunused-variable]
+     uint32 intmask;
+            ^
+main.c:106:10: warning: unused variable 'TimerCountBuffer' [-Wunused-variable]
+     char TimerCountBuffer[16u]; 
+          ^
 arm-none-eabi-gcc.exe -mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=.\CortexM0\ARM_GCC_541\Debug/cyfitter_cfg.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og -c Generated_Source\PSoC4\cyfitter_cfg.c -o .\CortexM0\ARM_GCC_541\Debug\cyfitter_cfg.o
 arm-none-eabi-gcc.exe -mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=.\CortexM0\ARM_GCC_541\Debug/cymetadata.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og -c Generated_Source\PSoC4\cymetadata.c -o .\CortexM0\ARM_GCC_541\Debug\cymetadata.o
 arm-none-eabi-gcc.exe -mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=.\CortexM0\ARM_GCC_541\Debug/LED_Alarm.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og -c Generated_Source\PSoC4\LED_Alarm.c -o .\CortexM0\ARM_GCC_541\Debug\LED_Alarm.o
@@ -77,9 +85,11 @@ arm-none-eabi-gcc.exe -mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-
 arm-none-eabi-gcc.exe -mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=.\CortexM0\ARM_GCC_541\Debug/Timer1.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og -c Generated_Source\PSoC4\Timer1.c -o .\CortexM0\ARM_GCC_541\Debug\Timer1.o
 arm-none-eabi-gcc.exe -mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=.\CortexM0\ARM_GCC_541\Debug/Timer1_PM.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og -c Generated_Source\PSoC4\Timer1_PM.c -o .\CortexM0\ARM_GCC_541\Debug\Timer1_PM.o
 arm-none-eabi-gcc.exe -mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=.\CortexM0\ARM_GCC_541\Debug/isrTimer1.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og -c Generated_Source\PSoC4\isrTimer1.c -o .\CortexM0\ARM_GCC_541\Debug\isrTimer1.o
+arm-none-eabi-gcc.exe -mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=.\CortexM0\ARM_GCC_541\Debug/Pin_1.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og -c Generated_Source\PSoC4\Pin_1.c -o .\CortexM0\ARM_GCC_541\Debug\Pin_1.o
+arm-none-eabi-gcc.exe -mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=.\CortexM0\ARM_GCC_541\Debug/Pin_1_PM.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og -c Generated_Source\PSoC4\Pin_1_PM.c -o .\CortexM0\ARM_GCC_541\Debug\Pin_1_PM.o
 arm-none-eabi-as.exe -mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -alh=.\CortexM0\ARM_GCC_541\Debug/UART_AsmGnu.lst -g -W -o .\CortexM0\ARM_GCC_541\Debug\UART_AsmGnu.o Generated_Source\PSoC4\UART_AsmGnu.s
 arm-none-eabi-as.exe -mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -alh=.\CortexM0\ARM_GCC_541\Debug/CyBootAsmGnu.lst -g -W -o .\CortexM0\ARM_GCC_541\Debug\CyBootAsmGnu.o Generated_Source\PSoC4\CyBootAsmGnu.s
-arm-none-eabi-ar.exe -rs .\CortexM0\ARM_GCC_541\Debug\RTC_P4_WDT_Example01.a .\CortexM0\ARM_GCC_541\Debug\LED_Alarm.o .\CortexM0\ARM_GCC_541\Debug\LED_Alarm_PM.o .\CortexM0\ARM_GCC_541\Debug\LED_WdtIsr.o .\CortexM0\ARM_GCC_541\Debug\LED_WdtIsr_PM.o .\CortexM0\ARM_GCC_541\Debug\RTC.o .\CortexM0\ARM_GCC_541\Debug\UART.o .\CortexM0\ARM_GCC_541\Debug\LFCLK_Out.o .\CortexM0\ARM_GCC_541\Debug\LFCLK_Out_PM.o .\CortexM0\ARM_GCC_541\Debug\CyFlash.o .\CortexM0\ARM_GCC_541\Debug\CyLib.o .\CortexM0\ARM_GCC_541\Debug\cyPm.o .\CortexM0\ARM_GCC_541\Debug\cyutils.o .\CortexM0\ARM_GCC_541\Debug\CyDMA.o .\CortexM0\ARM_GCC_541\Debug\CyLFClk.o .\CortexM0\ARM_GCC_541\Debug\cy_em_eeprom.o .\CortexM0\ARM_GCC_541\Debug\Clock_2.o .\CortexM0\ARM_GCC_541\Debug\Timer1.o .\CortexM0\ARM_GCC_541\Debug\Timer1_PM.o .\CortexM0\ARM_GCC_541\Debug\isrTimer1.o .\CortexM0\ARM_GCC_541\Debug\UART_AsmGnu.o .\CortexM0\ARM_GCC_541\Debug\CyBootAsmGnu.o
+arm-none-eabi-ar.exe -rs .\CortexM0\ARM_GCC_541\Debug\RTC_P4_WDT_Example01.a .\CortexM0\ARM_GCC_541\Debug\LED_Alarm.o .\CortexM0\ARM_GCC_541\Debug\LED_Alarm_PM.o .\CortexM0\ARM_GCC_541\Debug\LED_WdtIsr.o .\CortexM0\ARM_GCC_541\Debug\LED_WdtIsr_PM.o .\CortexM0\ARM_GCC_541\Debug\RTC.o .\CortexM0\ARM_GCC_541\Debug\UART.o .\CortexM0\ARM_GCC_541\Debug\LFCLK_Out.o .\CortexM0\ARM_GCC_541\Debug\LFCLK_Out_PM.o .\CortexM0\ARM_GCC_541\Debug\CyFlash.o .\CortexM0\ARM_GCC_541\Debug\CyLib.o .\CortexM0\ARM_GCC_541\Debug\cyPm.o .\CortexM0\ARM_GCC_541\Debug\cyutils.o .\CortexM0\ARM_GCC_541\Debug\CyDMA.o .\CortexM0\ARM_GCC_541\Debug\CyLFClk.o .\CortexM0\ARM_GCC_541\Debug\cy_em_eeprom.o .\CortexM0\ARM_GCC_541\Debug\Clock_2.o .\CortexM0\ARM_GCC_541\Debug\Timer1.o .\CortexM0\ARM_GCC_541\Debug\Timer1_PM.o .\CortexM0\ARM_GCC_541\Debug\isrTimer1.o .\CortexM0\ARM_GCC_541\Debug\Pin_1.o .\CortexM0\ARM_GCC_541\Debug\Pin_1_PM.o .\CortexM0\ARM_GCC_541\Debug\UART_AsmGnu.o .\CortexM0\ARM_GCC_541\Debug\CyBootAsmGnu.o
 arm-none-eabi-ar.exe: creating .\CortexM0\ARM_GCC_541\Debug\RTC_P4_WDT_Example01.a
 arm-none-eabi-gcc.exe -Wl,--start-group -o C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\CortexM0\ARM_GCC_541\Debug\RTC_P4_WDT_Example01.elf .\CortexM0\ARM_GCC_541\Debug\main.o .\CortexM0\ARM_GCC_541\Debug\cyfitter_cfg.o .\CortexM0\ARM_GCC_541\Debug\cymetadata.o .\CortexM0\ARM_GCC_541\Debug\Cm0Start.o .\CortexM0\ARM_GCC_541\Debug\RTC_P4_WDT_Example01.a -mcpu=cortex-m0 -mthumb -L Generated_Source\PSoC4 -Wl,-Map,.\CortexM0\ARM_GCC_541\Debug/RTC_P4_WDT_Example01.map -T Generated_Source\PSoC4\cm0gcc.ld -specs=nano.specs -Wl,--gc-sections -g -ffunction-sections -Og -ffat-lto-objects -Wl,--end-group
 cyelftool.exe -C C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\CortexM0\ARM_GCC_541\Debug\RTC_P4_WDT_Example01.elf --flash_row_size 256 --flash_size 262144 --flash_offset 0x00000000
@@ -87,6 +97,6 @@ No ELF section .cychecksum found, creating one
 Application checksum calculated and stored in ELF section .cychecksum
 Checksum calculated and stored in ELF section .cymeta
 cyelftool.exe -S C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\CortexM0\ARM_GCC_541\Debug\RTC_P4_WDT_Example01.elf
-Flash used: 12710 of 262144 bytes (4.8%).
-SRAM used: 1760 of 32768 bytes (5.4%). Stack: 1024 bytes. Heap: 128 bytes.
---------------- Rebuild Succeeded: 08/12/2020 15:57:21 ---------------
+Flash used: 12646 of 262144 bytes (4.8%).
+SRAM used: 1776 of 32768 bytes (5.4%). Stack: 1024 bytes. Heap: 128 bytes.
+--------------- Rebuild Succeeded: 08/12/2020 17:46:21 ---------------

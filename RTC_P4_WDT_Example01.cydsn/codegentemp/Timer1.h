@@ -82,7 +82,7 @@ extern uint8  Timer1_initVar;
 #define Timer1_TC_COUNT_SIGNAL_MODE           (3lu)
 #define Timer1_TC_START_SIGNAL_MODE           (0lu)
 #define Timer1_TC_STOP_SIGNAL_MODE            (0lu)
-#define Timer1_TC_CAPTURE_SIGNAL_MODE         (0lu)
+#define Timer1_TC_CAPTURE_SIGNAL_MODE         (1lu)
 
 /* Signal present */
 #define Timer1_TC_RELOAD_SIGNAL_PRESENT       (0lu)
@@ -92,7 +92,7 @@ extern uint8  Timer1_initVar;
 #define Timer1_TC_CAPTURE_SIGNAL_PRESENT      (0lu)
 
 /* Interrupt Mask */
-#define Timer1_TC_INTERRUPT_MASK              (1lu)
+#define Timer1_TC_INTERRUPT_MASK              (3lu)
 
 /* PWM Mode */
 /* Parameters */
@@ -129,7 +129,7 @@ extern uint8  Timer1_initVar;
 ***************************************/
 
 /* Timer/Counter Mode */
-#define Timer1_TC_PERIOD_VALUE                (16384lu)
+#define Timer1_TC_PERIOD_VALUE                (32768lu)
 #define Timer1_TC_COMPARE_VALUE               (16384lu)
 #define Timer1_TC_COMPARE_BUF_VALUE           (65535lu)
 #define Timer1_TC_COMPARE_SWAP                (0lu)

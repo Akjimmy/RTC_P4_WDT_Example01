@@ -30,6 +30,8 @@
 #include "Timer1.h"
 #include "Clock_2.h"
 #include "isrTimer1.h"
+#include "Pin_1.h"
+#include "Pin_1_aliases.h"
 #include "cy_em_eeprom.h"
 #include "core_cm0_psoc4.h"
 #include "CyFlash.h"

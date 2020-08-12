@@ -75,8 +75,14 @@ CY_ISR_PROTO(Time1_ISR_Handler);
 uint32 ui100mS=0;
 uint8   byUpdateTime=0;
 
-#define _TEST_TIMER_
+uint32  Timer1Count;
+uint8   byUpdateCapture=0;
 
+
+#define _TEST_TIMER_    // if test timer mode,Low power is sleep mode
+
+//#define _CAPTURE_MODE_  //Timer1 must configed as Capture mode,and select Interrupt on Compare/capture.
+                          // Timer1 capture trigger input select falling edge   
 /*******************************************************************************
 * Function Name: main
 ********************************************************************************
@@ -95,11 +101,15 @@ int main()
 {
     char timeBuffer[16u];
     char dateBuffer[16u];
-
+    
+    #ifdef _TEST_TIMER_
+    char TimerCountBuffer[16u]; 
     uint32 time;
     uint32 date;
-    
-    
+    uint32 intmask;
+    uint32 intSource;
+    #endif
+   
     /* Enable WCO */
     CySysClkWcoStart();
     
@@ -149,64 +159,75 @@ int main()
     /* Set function AlarmIsrHandler to be called when alarm triggers */
     RTC_SetAlarmHandler(AlarmIsrHandler);
     
+    #ifdef _TEST_TIMER_
     isrTimer1_StartEx(Time1_ISR_Handler);
     Timer1_Start();
-    uint32 intmask;
-    uint32 intSource;\
+    #endif
     
-    intmask=Timer1_GetInterruptSourceMasked();
-    intSource=Timer1_GetInterruptSource();
+    //###########################################
+    //intmask=Timer1_GetInterruptSourceMasked();
+    //intSource=Timer1_GetInterruptSource();
     
-    
-    if(intmask==Timer1_INTR_MASK_TC ||intSource==Timer1_INTR_MASK_TC)
-    {
-        CyDelay(100);    
-    }
-    if(intmask==Timer1_INTR_MASK_CC_MATCH || intSource==Timer1_INTR_MASK_CC_MATCH)
-    {
-        CyDelay(100);    
-    }
-    
-    while(1)
+    //if(intmask==Timer1_INTR_MASK_TC ||intSource==Timer1_INTR_MASK_TC)
+    //{
+    //    CyDelay(100);    
+    //}
+    //if(intmask==Timer1_INTR_MASK_CC_MATCH || intSource==Timer1_INTR_MASK_CC_MATCH)
+    //{
+    //    CyDelay(100);    
+    //}
+    //##############################################
+    while(1)// #1 while(1)
     {
         if(byUpdateTime)
         {
-        byUpdateTime=0;
-        /* Get Date and Time from RTC */
-        time = RTC_GetTime();
-        date = RTC_GetDate();
-       /* Print Date and Time to UART */
-        sprintf(timeBuffer, "%02lu:%02lu:%02lu.%1lu", RTC_GetHours(time), RTC_GetMinutes(time), RTC_GetSecond(time),ui100mS);
-        sprintf(dateBuffer, "%02lu/%02lu/%02lu", RTC_GetMonth(date), RTC_GetDay(date), RTC_GetYear(date));
+            byUpdateTime=0;
+            /* Get Date and Time from RTC */
+            time = RTC_GetTime();
+            date = RTC_GetDate();
+            /* Print Date and Time to UART */
+            sprintf(timeBuffer, "%02lu:%02lu:%02lu.%1lu", RTC_GetHours(time), RTC_GetMinutes(time), RTC_GetSecond(time),ui100mS);
+            sprintf(dateBuffer, "%02lu/%02lu/%02lu", RTC_GetMonth(date), RTC_GetDay(date), RTC_GetYear(date));
 
-        UART_PutString(timeBuffer);
-        UART_PutString(" | ");
-        UART_PutString(dateBuffer);
-        UART_PutString(" | ");
+            UART_PutString(timeBuffer);
+            UART_PutString(" | ");
+            UART_PutString(dateBuffer);
+            UART_PutString(" | ");
 
-        if (alarmFlag == 1u)
-        {
-            UART_PutString("  Alarm ");
-            alarmFlag  = 0u;
-        }
-        else
-        {
-            UART_PutString("No alarm");
-        }
+            if (alarmFlag == 1u)
+            {
+                UART_PutString("  Alarm ");
+                alarmFlag  = 0u;
+            }
+            else
+            {
+                UART_PutString("No alarm");
+            }
 
-        UART_PutString("\r");
+                UART_PutString("\r");
         }
         
-        /* Switch to Sleep Mode */
+        #ifdef _TEST_TIMER_
+            #ifdef _CAPTURE_MODE_
+            if(byUpdateCapture)
+            {
+                byUpdateCapture=0;
+                sprintf(TimerCountBuffer, "%5lu",Timer1Count);
+                UART_PutString("Timer count= ");
+                UART_PutString(TimerCountBuffer);
+                UART_PutString("\r");
+            }
+            #endif
+        #endif
+        
         #ifndef _TEST_TIMER_ // timer can not wakeup CPU from deepsleep
-            CySysPmDeepSleep();           
+            CySysPmDeepSleep();  // Switch to Deepsleep Mode         
         #endif
         
         #ifdef _TEST_TIMER_
-            CySysPmSleep();           
+            CySysPmSleep();   // Switch to Sleep Mode       
         #endif    
-        
-    }
+    }// Loop of #1 while(1)
 }
 
 
@@ -266,7 +287,10 @@ void UpdateTimeIsrHandler(void)
     ui100mS++;
     if(ui100mS>9)
         ui100mS=0;
-    //LED_WdtIsr_Write((uint8)~(LED_WdtIsr_Read()));
+    #ifndef _TEST_TIMER_
+    LED_WdtIsr_Write((uint8)~(LED_WdtIsr_Read()));
+    #endif
+    
     RTC_Update();
     byUpdateTime=1;
 }
@@ -290,7 +314,9 @@ void AlarmIsrHandler(void)
     alarmFlag = 1u;
 
     /* Toggle pin state */
-    // LED_Alarm_Write((uint8)~(LED_Alarm_Read()));
+    #ifndef _TEST_TIMER_
+    LED_Alarm_Write((uint8)~(LED_Alarm_Read()));
+    #endif
 
     /* Clear interrupts state */
     RTC_ClearAlarmStatus();
@@ -311,50 +337,39 @@ void AlarmIsrHandler(void)
 *******************************************************************************/
 CY_ISR(Time1_ISR_Handler)
 {
-    //
-    uint32  intmask;
-    uint32  intSource;
-    uint32  Timer1Count;
-    
+    // ******************************************************
     isrTimer1_ClearPending();
     
-    intSource=Timer1_GetInterruptSource();
-    intmask=Timer1_GetInterruptSourceMasked();
+     // ******************************************************
     
+    //######################################################
+    //uint32  intSource;
+    //intSource=Timer1_GetInterruptSource();// do not use this Function.
+    //Timer1_ClearInterrupt(intSource);
+    //######################################################
     
-     if(intmask==Timer1_INTR_MASK_TC ||intSource==Timer1_INTR_MASK_TC)
-    {
-        CyDelay(100);    
-    }
-    if(intmask==Timer1_INTR_MASK_CC_MATCH || intSource==Timer1_INTR_MASK_CC_MATCH)
-    {
-        CyDelay(100);    
-    }
-    
-    
-    Timer1_ClearInterrupt(intmask);
-    Timer1_ClearInterrupt(intSource);
-    //LED_Alarm_Write((uint8)~(LED_Alarm_Read()));
-    
-    
-    if(intmask==Timer1_INTR_MASK_TC)
-    {
-        //Timer1_ClearInterrupt(Timer1_INTR_MASK_TC);
-        //Timer1Count=Timer1_ReadCounter();
-        //LED_Alarm_Write(0);
-        LED_Alarm_Write((uint8)~(LED_Alarm_Read()));//Red LED
-        //LED_WdtIsr_Write(1);
-    }
-    if(intmask==Timer1_INTR_MASK_CC_MATCH)
-    {
-       // Timer1_ClearInterrupt(Timer1_INTR_MASK_CC_MATCH);
-        //Timer1Count=Timer1_ReadCounter();
-        //LED_Alarm_Write(1);
-        //LED_WdtIsr_Write(0);
-        LED_WdtIsr_Write((uint8)~(LED_WdtIsr_Read()));//Blue LED
-    }
-    
+    uint32  intmask;
+    intmask=Timer1_GetInterruptSourceMasked();// get masked interrupt source which raising this interrupt
    
+    Timer1_ClearInterrupt(intmask);
+        
+    if(intmask==Timer1_INTR_MASK_TC)    //timer counts overflow event
+    {
+        Timer1Count=Timer1_ReadCounter();
+        LED_Alarm_Write((uint8)~(LED_Alarm_Read()));//Red LED
+       
+    }
+    if(intmask==Timer1_INTR_MASK_CC_MATCH) // timer counts compare match event
+    {
+        Timer1Count=Timer1_ReadCounter();
+       
+        LED_WdtIsr_Write((uint8)~(LED_WdtIsr_Read()));//Blue LED
+        
+        #ifdef _CAPTURE_MODE_
+        byUpdateCapture=1;
+        #endif
+    }
+  
 }   
 
 

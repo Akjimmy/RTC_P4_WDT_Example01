@@ -1,6 +1,6 @@
 (DELAYFILE
  (SDFVERSION "IEEE 1497 4.0")
- (DATE "2020-08-12T07:57:14Z")
+ (DATE "2020-08-12T09:46:12Z")
  (DESIGN "RTC_P4_WDT_Example01")
  (VENDOR "Cypress Semiconductor")
  (PROGRAM "PSoC Creator")
@@ -22,6 +22,7 @@
     (INTERCONNECT \\UART\:tx\(0\)_PAD\\ \\UART\:tx\(0\)\\.pad_in (0.000:0.000:0.000))
     (INTERCONNECT LFCLK_Out\(0\).pad_out LFCLK_Out\(0\)_PAD (0.000:0.000:0.000))
     (INTERCONNECT LFCLK_Out\(0\)_PAD LFCLK_Out\(0\).pad_in (0.000:0.000:0.000))
+    (INTERCONNECT Pin_1\(0\)_PAD Pin_1\(0\).pad_in (0.000:0.000:0.000))
    )
   )
  )

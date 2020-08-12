@@ -114,6 +114,10 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Timer1_PM.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\isrTimer1.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\isrTimer1.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Pin_1.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Pin_1.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Pin_1_aliases.h</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\Pin_1_PM.c</File>
         </Files>
       </Folder>
       <Folder BuildType="EXCLUDE" Path=".\codegentemp">

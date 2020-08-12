@@ -146,6 +146,28 @@
 <dep name=".\Generated_Source\PSoC4\cytypes.h" />
 </file>
 <file name=".\Generated_Source\PSoC4\LFCLK_Out_PM.c" />
+<file name=".\CortexM0\ARM_GCC_541\Debug\Pin_1.o">
+<dep name=".\Generated_Source\PSoC4\Pin_1.c" />
+<dep name=".\Generated_Source\PSoC4\Pin_1.h" />
+<dep name=".\Generated_Source\PSoC4\Pin_1_aliases.h" />
+<dep name=".\Generated_Source\PSoC4\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC4\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC4\cypins.h" />
+<dep name=".\Generated_Source\PSoC4\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC4\Pin_1.c" />
+<file name=".\Generated_Source\PSoC4\Pin_1.h" />
+<file name=".\Generated_Source\PSoC4\Pin_1_aliases.h" />
+<file name=".\CortexM0\ARM_GCC_541\Debug\Pin_1_PM.o">
+<dep name=".\Generated_Source\PSoC4\Pin_1.h" />
+<dep name=".\Generated_Source\PSoC4\Pin_1_PM.c" />
+<dep name=".\Generated_Source\PSoC4\Pin_1_aliases.h" />
+<dep name=".\Generated_Source\PSoC4\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC4\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC4\cypins.h" />
+<dep name=".\Generated_Source\PSoC4\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC4\Pin_1_PM.c" />
 <file name=".\CortexM0\ARM_GCC_541\Debug\RTC.o">
 <dep name=".\Generated_Source\PSoC4\CyLFClk.h" />
 <dep name=".\Generated_Source\PSoC4\CyLib.h" />
@@ -268,6 +290,8 @@
 <dep name=".\Generated_Source\PSoC4\LED_WdtIsr_aliases.h" />
 <dep name=".\Generated_Source\PSoC4\LFCLK_Out.h" />
 <dep name=".\Generated_Source\PSoC4\LFCLK_Out_aliases.h" />
+<dep name=".\Generated_Source\PSoC4\Pin_1.h" />
+<dep name=".\Generated_Source\PSoC4\Pin_1_aliases.h" />
 <dep name=".\Generated_Source\PSoC4\RTC.h" />
 <dep name=".\Generated_Source\PSoC4\Timer1.h" />
 <dep name=".\Generated_Source\PSoC4\UART.h" />
@@ -304,6 +328,28 @@
 <dep name=".\Generated_Source\PSoC4\cyfittergnu.inc" />
 </file>
 <file name=".\Generated_Source\PSoC4\UART_AsmGnu.s" />
+<file name=".\CortexM0\ARM_GCC_541\Debug\Pin1_0.o">
+<dep name=".\Generated_Source\PSoC4\Pin1_0.c" />
+<dep name=".\Generated_Source\PSoC4\Pin1_0.h" />
+<dep name=".\Generated_Source\PSoC4\Pin1_0_aliases.h" />
+<dep name=".\Generated_Source\PSoC4\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC4\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC4\cypins.h" />
+<dep name=".\Generated_Source\PSoC4\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC4\Pin1_0.c" />
+<file name=".\Generated_Source\PSoC4\Pin1_0.h" />
+<file name=".\Generated_Source\PSoC4\Pin1_0_aliases.h" />
+<file name=".\CortexM0\ARM_GCC_541\Debug\Pin1_0_PM.o">
+<dep name=".\Generated_Source\PSoC4\Pin1_0.h" />
+<dep name=".\Generated_Source\PSoC4\Pin1_0_PM.c" />
+<dep name=".\Generated_Source\PSoC4\Pin1_0_aliases.h" />
+<dep name=".\Generated_Source\PSoC4\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC4\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC4\cypins.h" />
+<dep name=".\Generated_Source\PSoC4\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC4\Pin1_0_PM.c" />
 <file name=".\CortexM0\ARM_GCC_541\Debug\Timer_1.o">
 <dep name=".\Generated_Source\PSoC4\CyLFClk.h" />
 <dep name=".\Generated_Source\PSoC4\CyLib.h" />
@@ -359,6 +405,8 @@
 <dep name=".\CortexM0\ARM_GCC_541\Debug\Timer1.o" />
 <dep name=".\CortexM0\ARM_GCC_541\Debug\Timer1_PM.o" />
 <dep name=".\CortexM0\ARM_GCC_541\Debug\isrTimer1.o" />
+<dep name=".\CortexM0\ARM_GCC_541\Debug\Pin_1.o" />
+<dep name=".\CortexM0\ARM_GCC_541\Debug\Pin_1_PM.o" />
 <dep name=".\CortexM0\ARM_GCC_541\Debug\RTC_P4_WDT_Example01.a" />
 </file>
 </CyGuid_1173175f-1b9b-4ad4-a065-754a48a27021>
@@ -401,6 +449,10 @@
 <name_val_pair name="Generated_Source\PSoC4\Timer1.c" v="-mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og" />
 <name_val_pair name="Generated_Source\PSoC4\Timer1_PM.c" v="-mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og" />
 <name_val_pair name="Generated_Source\PSoC4\isrTimer1.c" v="-mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC4\Pin1_0.c" v="-mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC4\Pin1_0_PM.c" v="-mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC4\Pin_1.c" v="-mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC4\Pin_1_PM.c" v="-mcpu=cortex-m0 -mthumb -I. -IGenerated_Source\PSoC4 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -Wall -ffunction-sections -ffat-lto-objects -Og" />
 </name>
 </genericCmdLineData>
 <codeGenCmdLineTag v="-.appdatapath &quot;C:\Users\Jimmy\AppData\Local\Cypress Semiconductor\PSoC Creator\4.2&quot; -.fdsnotice -.fdswarpdepfile=warp_dependencies.txt -.fdselabdepfile=elab_dependencies.txt -.fdsbldfile=generated_files.txt -.fdsreffile=referenced_files.txt -p C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\RTC_P4_WDT_Example01.cyprj -d CYBLE-212006-01 -s C:\Users\Jimmy\temp\RTC_P4_WDT_Example01\RTC_P4_WDT_Example01.cydsn\Generated_Source\PSoC4 -- -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE" />
@@ -547,6 +599,12 @@
 <v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\cy_isr_v1_70\Custom\custom.cs</v>
 <v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\cy_isr_v1_70\PSoC4\API\intc.c</v>
 <v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\cy_isr_v1_70\PSoC4\API\intc.h</v>
+<v>${CyRoot}\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\SwitchSPST_v1_0\SwitchSPST_v1_0.cysym</v>
+<v>${CyRoot}\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\SwitchSPST_v1_0\SwitchSPST_v1_0.pdf</v>
+<v>${CyRoot}\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\SwitchSPST_v1_0\version.cypatch</v>
+<v>${CyRoot}\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\Gnd_v1_0\Gnd_v1_0.cysym</v>
+<v>${CyRoot}\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\Gnd_v1_0\Gnd_v1_0.pdf</v>
+<v>${CyRoot}\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\Gnd_v1_0\version.cypatch</v>
 <v>.\RTC_P4_WDT_Example01.cydwr</v>
 <v>..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\Em_EEPROM_Dynamic_v2_20\API\cy_em_eeprom.c</v>
 <v>..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\Em_EEPROM_Dynamic_v2_20\API\cy_em_eeprom.h</v>
@@ -656,13 +714,21 @@
 <v>Generated_Source\PSoC4\Timer1_PM.c</v>
 <v>Generated_Source\PSoC4\isrTimer1.c</v>
 <v>Generated_Source\PSoC4\isrTimer1.h</v>
+<v>Generated_Source\PSoC4\Pin1_0.c</v>
+<v>Generated_Source\PSoC4\Pin1_0.h</v>
+<v>Generated_Source\PSoC4\Pin1_0_aliases.h</v>
+<v>Generated_Source\PSoC4\Pin1_0_PM.c</v>
+<v>Generated_Source\PSoC4\Pin_1.c</v>
+<v>Generated_Source\PSoC4\Pin_1.h</v>
+<v>Generated_Source\PSoC4\Pin_1_aliases.h</v>
+<v>Generated_Source\PSoC4\Pin_1_PM.c</v>
 </gen_list>
 <warp_dep>
 <v>C:\Program Files\Cypress\PSoC Creator\4.2\PSoC Creator\warp\lib\ieee\work\stdlogic.vif</v>
 <v>C:\Program Files\Cypress\PSoC Creator\4.2\PSoC Creator\warp\lib\common\stdlogic\mod_genv.vif</v>
 <v>C:\Program Files\Cypress\PSoC Creator\4.2\PSoC Creator\warp\lib\common\stdlogic\rtlpkg.vif</v>
 </warp_dep>
-<deps_time v="132416926364095975" />
+<deps_time v="132416991758266307" />
 <top_block v="TopDesign" />
 <last_generation v="18" />
 <pdl_path v="" />
@@ -672,7 +738,7 @@
 <dataGuid v="769d31ea-68b1-4f0c-b90a-7c10a43ee563">
 <CyGuid_769d31ea-68b1-4f0c-b90a-7c10a43ee563 type_name="CyDesigner.Common.ProjMgmt.Model.CyLinkCustomData" version="1">
 <link_deps_times>
-<name_val_pair name="c9323d49-d323-40b8-9b59-cc008d68a989@Debug@CortexM0" v="132416926417649038" />
+<name_val_pair name="c9323d49-d323-40b8-9b59-cc008d68a989@Debug@CortexM0" v="132416991817419691" />
 </link_deps_times>
 </CyGuid_769d31ea-68b1-4f0c-b90a-7c10a43ee563>
 </dataGuid>
@@ -691,6 +757,7 @@
 <CyGuid_ccf7a56e-c00d-460c-82dd-56c8f54feb7f type_name="CyDesigner.Common.Debugger.CyWatchedVariableList+CyWatchedItem" version="1" window="0" name="Realtime" radix="decimal" />
 <CyGuid_ccf7a56e-c00d-460c-82dd-56c8f54feb7f type_name="CyDesigner.Common.Debugger.CyWatchedVariableList+CyWatchedItem" version="1" window="0" name="Timer1Count" radix="Default" />
 <CyGuid_ccf7a56e-c00d-460c-82dd-56c8f54feb7f type_name="CyDesigner.Common.Debugger.CyWatchedVariableList+CyWatchedItem" version="1" window="0" name="intmask" radix="Default" />
+<CyGuid_ccf7a56e-c00d-460c-82dd-56c8f54feb7f type_name="CyDesigner.Common.Debugger.CyWatchedVariableList+CyWatchedItem" version="1" window="0" name="TimerCountBuffer" radix="Default" />
 </debugger_watch_list>
 </CyGuid_bf610382-39c6-441f-80b8-b04622ea7845>
 </dataGuid>
@@ -701,13 +768,14 @@
 <v>Off-Chip</v>
 </tree_states_tab_names>
 <tree_states>
-<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="Cypress Component Catalog\Communications\UART (SCB mode) [v4.0]">
+<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="Cypress Component Catalog\Ports and Pins\Digital Input Pin [v2.20]">
 <ExpandedNodeIds>
 <v>Cypress Component Catalog</v>
 <v>Cypress Component Catalog\Communications</v>
 <v>Cypress Component Catalog\Digital</v>
 <v>Cypress Component Catalog\Digital\Functions</v>
 <v>Cypress Component Catalog\Digital\Logic</v>
+<v>Cypress Component Catalog\Ports and Pins</v>
 <v>Cypress Component Catalog\System</v>
 </ExpandedNodeIds>
 <VisibleNodeIds>
@@ -735,29 +803,48 @@
 <v>Cypress Component Catalog\Digital\Logic\Logic Low '0' [v1.0]</v>
 <v>Cypress Component Catalog\Display</v>
 <v>Cypress Component Catalog\Ports and Pins</v>
+<v>Cypress Component Catalog\Ports and Pins\Analog Pin [v2.20]</v>
+<v>Cypress Component Catalog\Ports and Pins\Digital Bidirectional Pin [v2.20]</v>
+<v>Cypress Component Catalog\Ports and Pins\Digital Input Pin [v2.20]</v>
+<v>Cypress Component Catalog\Ports and Pins\Digital Output Pin [v2.20]</v>
 <v>Cypress Component Catalog\System</v>
 <v>Cypress Component Catalog\System\Bootloadable [v1.60]</v>
 <v>Cypress Component Catalog\System\Bootloader [v1.60]</v>
 <v>Cypress Component Catalog\System\Clock [v2.20]</v>
-<v>Cypress Component Catalog\System\Die Temperature [v1.0]</v>
-<v>Cypress Component Catalog\System\DMA Channel [v1.0]</v>
-<v>Cypress Component Catalog\System\Global Signal Reference [v2.10]</v>
-<v>Cypress Component Catalog\System\Interrupt [v1.70]</v>
-<v>Cypress Component Catalog\System\Real-time clock (RTC) [v1.30]</v>
-<v>Cypress Component Catalog\Thermal Management</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
-<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="">
+<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="Off-Chip Component Catalog\Power\Ground [v1.0]">
 <ExpandedNodeIds>
 <v>Off-Chip Component Catalog</v>
+<v>Off-Chip Component Catalog\Electro-Mechanical</v>
+<v>Off-Chip Component Catalog\Passive</v>
+<v>Off-Chip Component Catalog\Power</v>
 </ExpandedNodeIds>
 <VisibleNodeIds>
 <v>Off-Chip Component Catalog</v>
 <v>Off-Chip Component Catalog\Active</v>
 <v>Off-Chip Component Catalog\Diodes</v>
 <v>Off-Chip Component Catalog\Electro-Mechanical</v>
+<v>Off-Chip Component Catalog\Electro-Mechanical\Connector (1-20 Pins) [v1.0]</v>
+<v>Off-Chip Component Catalog\Electro-Mechanical\Motor (3 Phase) [v1.0]</v>
+<v>Off-Chip Component Catalog\Electro-Mechanical\Motor (DC) [v1.0]</v>
+<v>Off-Chip Component Catalog\Electro-Mechanical\Relay [v1.0]</v>
+<v>Off-Chip Component Catalog\Electro-Mechanical\Speaker [v1.0]</v>
+<v>Off-Chip Component Catalog\Electro-Mechanical\Switch (SPDT- DPDT) [v1.0]</v>
+<v>Off-Chip Component Catalog\Electro-Mechanical\Switch (SPST) [v1.0]</v>
+<v>Off-Chip Component Catalog\Electro-Mechanical\Test Point [v1.0]</v>
 <v>Off-Chip Component Catalog\Passive</v>
+<v>Off-Chip Component Catalog\Passive\Capacitor [v1.0]</v>
+<v>Off-Chip Component Catalog\Passive\Crystal [v1.0]</v>
+<v>Off-Chip Component Catalog\Passive\Fuse [v1.0]</v>
+<v>Off-Chip Component Catalog\Passive\Inductor [v1.0]</v>
+<v>Off-Chip Component Catalog\Passive\Potentiometer [v1.0]</v>
+<v>Off-Chip Component Catalog\Passive\Resistor [v1.0]</v>
+<v>Off-Chip Component Catalog\Passive\Transformer [v1.0]</v>
 <v>Off-Chip Component Catalog\Power</v>
+<v>Off-Chip Component Catalog\Power\Battery [v1.0]</v>
+<v>Off-Chip Component Catalog\Power\Ground [v1.0]</v>
+<v>Off-Chip Component Catalog\Power\Power [v1.0]</v>
 <v>Off-Chip Component Catalog\Sensors</v>
 <v>Off-Chip Component Catalog\Transistors</v>
 </VisibleNodeIds>
